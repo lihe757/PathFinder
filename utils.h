@@ -107,7 +107,7 @@ struct Coordinate
 		k = (a.y-b.y)/(a.x-b.x);
 	}
 
-	SPoint GetXProjection(float x,float y)
+	SPoint GetXProjection(float x)
 	{
 		SPoint c(0,0);
 		GetPointFromLine(c,xStart,xEnd,x);
@@ -117,7 +117,7 @@ struct Coordinate
 	SPoint	GetCoordinate(float x,float y)
 	{
 		SPoint c;
-		c=GetXProjection(x,y);
+		c=GetXProjection(x);
 		SPoint c2;
 		float tmpk=-1/k;
 		float bb=c.y-tmpk*c.x;
@@ -175,8 +175,8 @@ struct Line
 		
 	}
 
-
 };
+
 
 void DrawLine(HDC surface,const SPoint& a,const SPoint &b);
 #endif

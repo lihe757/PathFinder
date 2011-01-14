@@ -14,19 +14,19 @@ CBarrier::CBarrier(const SPoint *lpSpints,int nCount)
 //check a point is inner polygon
 bool CBarrier::IsPointInHouse(const SPoint &a)
 {
-	
-	
+
+
 	vector<SPoint>::const_iterator iter = vecPoint.begin();
 	if(iter==vecPoint.end())return false;
-	
+
 	SPoint tmp(iter->x,iter->y);
 	SVector2D vectA(tmp.x-a.x,tmp.y-a.y);
 	Vec2DNormalize(vectA);
 	iter++;
-			
+
 	SVector2D vectB((iter->x)-a.x,(iter->y)-a.y);
 	Vec2DNormalize(vectB);
-		
+
 	int b=Vec2DSign(vectA,vectB);
 	vectA=vectB;
 	iter++;
@@ -55,66 +55,37 @@ bool CBarrier::IsPointInHouse(const SPoint &a)
 
 bool CBarrier::IsIntersect(const SPoint &a,const SPoint &b)
 {
+	vector<SPoint>::const_iterator iter = vecPoint.begin();
+
+	SPoint pA(iter->x,iter->y);
+	iter++;
+
+	SPoint pB(iter->x,iter->y);
+	iter++;
+
+	SPoint pINT(0,0);
+	int flag = Intersection(a,b,pA,pB,pINT);
+	if(flag >0) return true;
+	pA=pB;
 
 
-	 vector<SPoint>::const_iterator iter = vecPoint.begin();
+	while(iter!=vecPoint.end())
+	{
 
-	 SPoint pA(iter->x,iter->y);
-	 iter++;
+		pB=SPoint(iter->x,iter->y);
+		flag = Intersection(a,b,pA,pB,pINT);
+		if(flag >0) return true;
+		pA=pB;
+		iter++;
+	}
 
-	 SPoint pB(iter->x,iter->y);
-	 iter++;
-	
-	 SPoint pINT(0,0);
-	 int flag = Intersection(a,b,pA,pB,pINT);
-	 if(flag >0) return true;
-	 pA=pB;
+	//original point line
+	pB=vecPoint[0];
+	flag = Intersection(a,b,pA,pB,pINT);
+	if(flag >0) return true;
 
+	return false;
 
-	 while(iter!=vecPoint.end())
-	 {
-		
-		  pB=SPoint(iter->x,iter->y);
-		  flag = Intersection(a,b,pA,pB,pINT);
-		 if(flag >0) return true;
-		 pA=pB;
-		 iter++;
-	 }
-
-	 pB=vecPoint[0];
-	  flag = Intersection(a,b,pA,pB,pINT);
-	 if(flag >0) return true;
-
-	 return false;
-
-
-
-	//Line line(a,b);
-
-	//vector<SPoint>::const_iterator iter = vecPoint.begin();
-	//if(iter==vecPoint.end())
-	//{
-	//	return false;
-
-	//}else
-	//{
-	//	SPoint tmp=*iter;
-	//	Location preLoaction=line.At(tmp);
-	//	iter++;
-	//	while(iter != vecPoint.end())
-	//	{
-	//		SPoint tmp2=*iter;
-	//		Location location = line.At(tmp2);
-	//		if(location !=preLoaction)
-	//		{
-	//			return true;
-	//		}
-
-	//		iter++;
-	//	}
-	//}
-
-	//return false;
 }
 
 void CBarrier::Render(HDC surface,const int cxClient,const int cyClient)

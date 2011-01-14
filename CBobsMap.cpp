@@ -138,55 +138,6 @@ void CBobsMap::Render(const int cxClient,
 
 
 
-	Coordinate cord(m_spA,m_spB);
-	SPoint c=m_spA;
-
-	for(int i=0;i<17;i++)
-	{
-		SPoint c3=cord.GetXProjection(10+i*20,-150);
-		SPoint c4=cord.GetCoordinate(10+i*20,RandInt(-100,100));
-		while(true)
-		{	
-			int j=0;
-			for(j=0;j<MAX_BARRIERS;j++)
-			{
-				bool flag = m_vecBarriers[j].IsPointInHouse(c4);
-				if(flag) break;
-
-			}
-			if(j==MAX_BARRIERS)break;
-			
-			c4=cord.GetCoordinate(10+i*20,RandInt(-100,100));
-
-
-		}
-		
-
-		DrawLine(surface,c3,c4);
-
-		DrawLine(surface,c,c4);
-		for(int j=0;j<MAX_BARRIERS;j++)
-		{
-			bool log = m_vecBarriers[j].IsIntersect(c,c4);
-			ostringstream buffer;
-			buffer <<"is intersect : "<<log<<std::endl;
-			OutputDebugString(buffer.str().c_str());
-			
-			
-			if(log)
-			{
-				OldPen = (HPEN)SelectObject(surface, RedPen);
-				DrawLine(surface,c,c4);
-				SelectObject(surface, OldPen);
-				
-			}
-		}
-			ostringstream buffer;
-			buffer <<"end--------------"<<std::endl;
-			OutputDebugString(buffer.str().c_str());
-
-		c=c4;
-	}
 
 
 
@@ -211,48 +162,74 @@ void CBobsMap::MemoryRender(const int cxClient,
 	int BlockSizeY = (cyClient - 2*border)/m_iMapHeight;
 	
 	HBRUSH	GreyBrush, OldBrush;
-	HPEN	NullPen, OldPen;
+	HPEN	NullPen, OldPen,RedPen;
 	
 	//grab a brush to fill our cells with
 	GreyBrush = (HBRUSH)GetStockObject(LTGRAY_BRUSH);
+	//grab a red pen 
+	RedPen = CreatePen(PS_SOLID, 1, RGB(255, 0, 0));
 
 	//grab a pen
-	NullPen = (HPEN)GetStockObject(NULL_PEN);
+	//NullPen = (HPEN)GetStockObject(NULL_PEN);
 	
 	//select them into the device conext
 	OldBrush = (HBRUSH)SelectObject(surface, GreyBrush);
-	OldPen	 =	(HPEN)SelectObject(surface, NullPen);
+	//OldPen	 =	(HPEN)SelectObject(surface, NullPen);
+
+	bool isGiveUp=false;
+	int testCount=0;
 	
+	Coordinate cord(m_spA,m_spB);
+	SPoint c=m_spA;
 
-
-	for (int y=0; y<m_iMapHeight; ++y)
+	SVector2D line(m_spA.x-m_spB.x,m_spA.y-m_spB.y);
+	int count = (int) Vec2DLength(line)/10;
+	for(int i=0;i<=count;i++)
 	{
-		for (int x=0; x<m_iMapWidth; ++x)
+		SPoint c3=cord.GetXProjection(i*10);
+		SPoint c4=cord.GetCoordinate(i*10,RandInt(-100,100));
+		while(true)
 		{
-			//calculate the corners of each cell
-			int left  = border + (BlockSizeX * x);
-			int right = left + BlockSizeX;
-			
-			int top    = border + (BlockSizeY * y);
-			int bottom = top + BlockSizeY;
-
-
-			
-			//draw green rectangle if this is a wall
-			if (memory[y][x] == 1)
+			int j;
+			for(j=0;j<MAX_BARRIERS;j++)
 			{
-				Rectangle(surface, left, top, right, bottom);
+				bool log = m_vecBarriers[j].IsIntersect(c,c4);		
+				if(log)
+				{
+					c4=cord.GetCoordinate(i*10,RandInt(-100,100));
+					testCount++;
+					break;
 
-				
+				}
 			}
+			if(testCount>100) 
+			{
+				isGiveUp=true;
+				break;
+			}
+
+			if(j==MAX_BARRIERS) break;
 		}
+
+		
+		DrawLine(surface,c3,c4);
+
+		if(isGiveUp) break;
+
+		OldPen = (HPEN)SelectObject(surface, RedPen);
+		DrawLine(surface,c,c4);
+		SelectObject(surface, OldPen);
+		c=c4;
 	}
-	
+
+
+
+
 	//restore the original brush
 	SelectObject(surface, OldBrush);
 	
 	//and pen
-	SelectObject(surface, OldPen);
+	//SelectObject(surface, OldPen);
 
 }
 
