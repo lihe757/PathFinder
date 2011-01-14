@@ -135,9 +135,7 @@ void CBobsMap::Render(const int cxClient,
 		m_vecBarriers[i].Render(surface,cxClient,cyClient);
 	}
 
-	MoveToEx(surface,m_spA.x,m_spA.y,NULL);
-	LineTo(surface,m_spB.x,m_spB.y);
-
+	DrawLine(surface , m_spA , m_spB);
 	//A
 	string Start = "A("+itos(m_spA.x)+string(",")+itos(m_spA.y)+string(")");	
 	TextOut(surface, m_spA.x-20,m_spA.y-20, Start.c_str(), Start.size());
@@ -198,6 +196,9 @@ void CBobsMap::MemoryRender(const int cxClient,
 	vector<WayPoint> wayPoint;
 	
 	Coordinate cord(m_spA,m_spB);
+	
+
+	
 	SPoint spPre=m_spA;
 	
 	//divied space 
@@ -231,11 +232,10 @@ void CBobsMap::MemoryRender(const int cxClient,
 			spPathAbsolute=cord.GetCoordinate(spRelative.x,spRelative.y);
 		}
 
+		if(isGiveUp) break;
 		//draw zhu zi
 		DrawLine(surface,spRoot,spPathAbsolute);
-
-		if(isGiveUp) break;
-
+		//draw line to connect spPre and spPathAbsolute
 		OldPen = (HPEN)SelectObject(surface, RedPen);
 		DrawLine(surface,spPre,spPathAbsolute);
 		SelectObject(surface, OldPen);
@@ -246,9 +246,9 @@ void CBobsMap::MemoryRender(const int cxClient,
 	}
 
 		
-	SPoint vc44=cord.GetXProjection((count+1)*20);
-	SPoint c44=cord.GetCoordinate(vc44.x,vc44.y);
-	wayPoint.push_back(WayPoint(vc44,c44));
+	
+	SPoint c44=cord.GetRelativePoint(m_spB.x,m_spB.y);
+	wayPoint.push_back(WayPoint(m_spB,c44));
 
 	//fix waypoint
 	SPoint fA,fB,fC;

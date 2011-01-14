@@ -8,6 +8,7 @@
 #include <iostream>
 #include <vector>
 #include "windows.h"
+#include "SVector2D.h"
 
 using namespace std;
 
@@ -83,6 +84,72 @@ void GetPointFromLine(SPoint &c,const SPoint &a,const SPoint &b,float dist);
 void GetPointFormLine(SPoint &c,const SPoint &a,const float &k,const float &b,float dist);
 int Intersection(SPoint p1, SPoint p2, SPoint p3, SPoint p4, SPoint &Int);
 
+
+
+/////////////////////////////////////////////////////////////////////
+//
+//	Line structure
+//
+/////////////////////////////////////////////////////////////////////
+enum Location
+{
+	LEFT,
+	RIGHT,
+	ON
+};
+struct Line
+{
+	SPoint xStart;
+	SPoint xEnd;
+	float	k;
+	float A;
+	float B;
+	float C;
+
+	Line(const SPoint &a,const SPoint &b)
+	{
+		k = (a.y-b.y)/(a.x-b.x);
+		float bb=a.y-k*(a.x);
+		A=k;
+		B=-1;
+		C=bb;
+	}
+	Line(float _k,const SPoint &p)
+	{
+		k =_k;
+		float bb= p.y-k*p.x;
+		A=k;
+		B=-1;
+		C=bb;
+	}
+
+	Location At(const SPoint &c)
+	{
+		int result = (int)(A*c.x+B*c.y+C);
+		if(result >0)
+		{
+			return RIGHT;
+		}
+		else if(result <0)
+		{
+			return LEFT;
+		}
+		else if(result ==0)
+		{
+			return ON;
+		}
+		return ON;		
+	}
+
+	float DistanceToMe(const SPoint &c)
+	{
+			float tmp =A*c.x+B*c.y+C;
+			return  (float)(tmp/sqrt(A*A+B*B));
+			
+	}
+
+};
+
 /////////////////////////////////////////////////////////////////////
 //
 //	Coordinate system structure
@@ -113,7 +180,7 @@ struct Coordinate
 		GetPointFromLine(c,xStart,xEnd,x);
 		return c;
 	}
-
+	// gather absolute coordinate
 	SPoint	GetCoordinate(float x,float y)
 	{
 		SPoint c;
@@ -125,56 +192,28 @@ struct Coordinate
 		return c2;
 
 	}
-};
-
-/////////////////////////////////////////////////////////////////////
-//
-//	Line structure
-//
-/////////////////////////////////////////////////////////////////////
-enum Location
-{
-	LEFT,
-	RIGHT,
-	ON
-};
-struct Line
-{
-	SPoint xStart;
-	SPoint xEnd;
-	float	k;
-	float A;
-	float B;
-	float C;
-
-	Line(const SPoint &a,const SPoint &b)
-	{
-		k = (a.y-b.y)/(a.x-b.x);
-		float bb=a.y-k*(a.x);
-		A=k;
-		B=-1;
-		C=bb;
-	}
-
-	Location At(const SPoint &c)
-	{
-		int result = (int)(A*c.x+B*c.y+C);
-		if(result >0)
-		{
-			return RIGHT;
-		}
-		else if(result <0)
-		{
-			return LEFT;
-		}
-		else if(result ==0)
-		{
-			return ON;
-		}
-		return ON;
+	SPoint GetRelativePoint(float x,float y)
+	{	SPoint p(x,y);
+		SPoint c;
+		Line lineX(xStart,xEnd);
 		
-	}
+		float dist = lineX.DistanceToMe(p);
+		c.y=(int)dist;
+		SVector2D vect(xStart.x-p.x,xStart.y-p.y);
+		float d = (float)Vec2DLength(vect);
+		float dx = (float)sqrt(d*d-dist*dist);
 
+		float tmpk = -1/k;
+		Line lineY(tmpk,xStart);
+
+		Location location = lineY.At(p);
+		if(location == RIGHT) dx*=-1;
+		c.x=(int)dx;
+
+		return c;
+
+
+	}
 };
 
 ///////////////////////////////////////////////////////
