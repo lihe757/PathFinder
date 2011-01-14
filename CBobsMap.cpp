@@ -191,64 +191,39 @@ void CBobsMap::MemoryRender(const int cxClient,
 	OldBrush = (HBRUSH)SelectObject(surface, GreyBrush);
 	//OldPen	 =	(HPEN)SelectObject(surface, NullPen);
 
-	bool isGiveUp=false;
-	int testCount=0;
 	vector<WayPoint> wayPoint;
-	
+	GetOneValidPath(wayPoint);
 	Coordinate cord(m_spA,m_spB);
-	
 
-	
-	SPoint spPre=m_spA;
-	
-	//divied space 
-	SVector2D line(m_spA.x-m_spB.x,m_spA.y-m_spB.y);
-	int count = (int) Vec2DLength(line)/20;
-	for(int i=1;i<=count;i++)
+
+	if(false)
 	{
-		SPoint spRoot=cord.GetXProjection(i*20);
-		SPoint spRelative(i*20,RandInt(-100,100));
-		SPoint spPathAbsolute=cord.GetCoordinate(spRelative.x,spRelative.y);
-		while(true)
-		{				
-			int j;
-			for(j=0;j<MAX_BARRIERS;j++)
-			{
-				bool log = m_vecBarriers[j].IsIntersect(spPre,spPathAbsolute);		
-				if(log)
-				{
-					testCount++;
-					break;
-				}
-			}
-			if(testCount>100) 
-			{
-				isGiveUp=true;
-				break;
-			}
-			if((j==MAX_BARRIERS)&&IsValidPoint(spPathAbsolute)) break;
 
-			spRelative=SPoint(i*20,RandInt(-100,100));
-			spPathAbsolute=cord.GetCoordinate(spRelative.x,spRelative.y);
+		SPoint spPre = m_spA;
+		vector<WayPoint>::const_iterator iter = wayPoint.begin();
+		while(iter != wayPoint.end())
+		{
+			
+			SPoint spRelative =iter->relativeXY;
+			spRelative.y=0;
+			SPoint spRoot = cord.GetCoordinate(spRelative.x,spRelative.y);
+			SPoint spPathAbsolute = iter->absoluteXY;
+
+			//draw zhu zi
+			DrawLine(surface,spRoot,spPathAbsolute);
+			//draw line to connect spPre and spPathAbsolute
+			OldPen = (HPEN)SelectObject(surface, RedPen);
+			DrawLine(surface,spPre,spPathAbsolute);
+			SelectObject(surface, OldPen);
+
+			spPre =spPathAbsolute;
+			iter++;
 		}
 
-		if(isGiveUp) break;
-		//draw zhu zi
-		DrawLine(surface,spRoot,spPathAbsolute);
-		//draw line to connect spPre and spPathAbsolute
-		OldPen = (HPEN)SelectObject(surface, RedPen);
-		DrawLine(surface,spPre,spPathAbsolute);
-		SelectObject(surface, OldPen);
-		
-		//save waypoint
-		wayPoint.push_back(WayPoint(spPathAbsolute,spRelative));
-		spPre=spPathAbsolute;
 	}
-
 		
-	
-	SPoint c44=cord.GetRelativePoint(m_spB.x,m_spB.y);
-	wayPoint.push_back(WayPoint(m_spB,c44));
+
+
 
 	//fix waypoint
 	SPoint fA,fB,fC;
@@ -448,6 +423,55 @@ bool CBobsMap::IsValidPoint (const SPoint &point)
 	if(boundBarrier.IsPointInHouse(point)) return true;
 	return false;
 
+}
+
+void CBobsMap::GetOneValidPath(vector<WayPoint> &path)
+{
+	bool isGiveUp=false;
+	int testCount=0;
+
+	Coordinate cord(m_spA,m_spB);
+	SPoint spPre=m_spA;
+
+	//divied space 
+	SVector2D line(m_spA.x-m_spB.x,m_spA.y-m_spB.y);
+	int count = (int) Vec2DLength(line)/20;
+	for(int i=1;i<=count;i++)
+	{
+		SPoint spRoot=cord.GetXProjection(i*20);
+		SPoint spRelative(i*20,RandInt(-100,100));
+		SPoint spPathAbsolute=cord.GetCoordinate(spRelative.x,spRelative.y);
+		while(true)
+		{				
+			int j;
+			for(j=0;j<MAX_BARRIERS;j++)
+			{
+				bool log = m_vecBarriers[j].IsIntersect(spPre,spPathAbsolute);		
+				if(log)
+				{
+					testCount++;
+					break;
+				}
+			}
+			if(testCount>100) 
+			{
+				isGiveUp=true;
+				break;
+			}
+			if((j==MAX_BARRIERS)&&IsValidPoint(spPathAbsolute)) break;
+
+			spRelative=SPoint(i*20,RandInt(-100,100));
+			spPathAbsolute=cord.GetCoordinate(spRelative.x,spRelative.y);
+		}
+
+		if(isGiveUp) break;
+		//save waypoint
+		path.push_back(WayPoint(spPathAbsolute,spRelative));
+		spPre=spPathAbsolute;
+	}
+	//push the last point
+	SPoint c44=cord.GetRelativePoint(m_spB.x,m_spB.y);
+	path.push_back(WayPoint(m_spB,c44));
 }
 
 

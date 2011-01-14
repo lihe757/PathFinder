@@ -29,6 +29,8 @@ using namespace std;
 struct SGenome
 {
 	vector<int> vecBits;
+	//lihx
+	vector<WayPoint> vecWayPoint;
 	
 	double		dFitness;
 	
@@ -42,6 +44,11 @@ struct SGenome
 		{
 			vecBits.push_back(RandInt(0, 1));
 		}
+	}
+	//lihx
+	SGenome(const vector<WayPoint> &points)
+	{
+		vecWayPoint = points;
 	}
 };
 
