@@ -177,6 +177,22 @@ struct Line
 
 };
 
+///////////////////////////////////////////////////////
+//
+//	waypoint struct
+//
+//////////////////////////////////////////////////////
+struct WayPoint
+{
+	SPoint absoluteXY;
+	SPoint relativeXY;
+
+	WayPoint(const SPoint &absXY,const SPoint &reXY)
+	{
+		absoluteXY=absXY;
+		relativeXY=reXY;
+	}
+};
 
 void DrawLine(HDC surface,const SPoint& a,const SPoint &b);
 #endif

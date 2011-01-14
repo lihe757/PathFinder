@@ -180,8 +180,8 @@ void CBobsMap::MemoryRender(const int cxClient,
 
 	bool isGiveUp=false;
 	int testCount=0;
-	vector<SPoint> validPoints;
-	vector<SPoint> validYValue;
+	vector<WayPoint> wayPoint;
+
 	
 	Coordinate cord(m_spA,m_spB);
 	SPoint c=m_spA;
@@ -189,7 +189,7 @@ void CBobsMap::MemoryRender(const int cxClient,
 	//divied space 
 	SVector2D line(m_spA.x-m_spB.x,m_spA.y-m_spB.y);
 	int count = (int) Vec2DLength(line)/20;
-	for(int i=0;i<=count;i++)
+	for(int i=1;i<=count;i++)
 	{
 		SPoint c3=cord.GetXProjection(i*20);
 		SPoint vc4(i*20,RandInt(-100,100));
@@ -227,9 +227,8 @@ void CBobsMap::MemoryRender(const int cxClient,
 		DrawLine(surface,c,c4);
 		SelectObject(surface, OldPen);
 		
-		//save valid point
-		validPoints.push_back(c4);
-		validYValue.push_back(vc4);
+		//save waypoint
+		wayPoint.push_back(WayPoint(c4,vc4));
 		c=c4;
 	}
 
@@ -238,13 +237,13 @@ void CBobsMap::MemoryRender(const int cxClient,
 	vector<SPoint> fixPoints;
 	fA=m_spA;
 	int	jj=1;
-	for(int i=0;i<(validPoints.size()-1);i+=jj)
+	for(int i=0;i<(wayPoint.size()-1);i+=jj)
 	{
-		fB=validPoints[i];
-		fC=validPoints[i+1];
+		fB=wayPoint[i].absoluteXY;
+		fC=wayPoint[i+1].absoluteXY;
 		
 		
-		if(abs(validYValue[i+1].y)<abs(validYValue[i].y))
+		if(abs(wayPoint[i+1].relativeXY.y)<abs(wayPoint[i].relativeXY.y))
 		{
 			int j;
 			for(j=0;j<MAX_BARRIERS;j++)
