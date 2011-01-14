@@ -48,7 +48,10 @@ void Clamp( double &arg, float min, float max)
 		arg = max;
 	}
 }
-
+///////////////////////////////
+//
+// a & b determine a line .the arg dist is distance of point c to point a
+/////////////////////
 void GetPointFromLine(SPoint &c ,const SPoint &a,const SPoint &b,float dist)
 {
 		float _dist=(float)abs(dist);	

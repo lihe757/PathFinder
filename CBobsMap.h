@@ -29,7 +29,7 @@ private:
 	
 	//storage for the map
 	static const int	map[MAP_HEIGHT][MAP_WIDTH];
-	//lihx
+	//lihx barries points 
 	static const int	m_aBarriesCount[MAX_BARRIERS];
 	static const SPoint	m_sp1[BARRIER_COUNT1];
 	static const SPoint	m_sp2[BARRIER_COUNT2];
@@ -58,6 +58,10 @@ public:
 
 	//we can use this array as Bobs memory if rqd
 	int					memory[MAP_HEIGHT][MAP_WIDTH];
+	
+	//lihx  diagonal length
+	float				 m_fDiagonalLength;
+	RECT				 m_recBound;
 
 	CBobsMap();
 	
@@ -74,6 +78,11 @@ public:
 	void MemoryRender(const int cxClient, const int cyClient, HDC surface);
 
 	void ResetMemory();
+
+	bool IsValidPoint (const SPoint &point);
+	
+	
+	
 
 
 };
