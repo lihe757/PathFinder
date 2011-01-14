@@ -162,12 +162,14 @@ void CBobsMap::MemoryRender(const int cxClient,
 	int BlockSizeY = (cyClient - 2*border)/m_iMapHeight;
 	
 	HBRUSH	GreyBrush, OldBrush;
-	HPEN	NullPen, OldPen,RedPen;
+	HPEN	NullPen, OldPen,RedPen,GreenPen;
 	
 	//grab a brush to fill our cells with
 	GreyBrush = (HBRUSH)GetStockObject(LTGRAY_BRUSH);
 	//grab a red pen 
 	RedPen = CreatePen(PS_SOLID, 1, RGB(255, 0, 0));
+	//grab a green pen 
+	GreenPen = CreatePen(PS_SOLID, 1, RGB(0,255, 0));
 
 	//grab a pen
 	//NullPen = (HPEN)GetStockObject(NULL_PEN);
@@ -178,16 +180,20 @@ void CBobsMap::MemoryRender(const int cxClient,
 
 	bool isGiveUp=false;
 	int testCount=0;
+	vector<SPoint> validPoints;
+	vector<SPoint> validYValue;
 	
 	Coordinate cord(m_spA,m_spB);
 	SPoint c=m_spA;
-
+	
+	//divied space 
 	SVector2D line(m_spA.x-m_spB.x,m_spA.y-m_spB.y);
-	int count = (int) Vec2DLength(line)/10;
+	int count = (int) Vec2DLength(line)/20;
 	for(int i=0;i<=count;i++)
 	{
-		SPoint c3=cord.GetXProjection(i*10);
-		SPoint c4=cord.GetCoordinate(i*10,RandInt(-100,100));
+		SPoint c3=cord.GetXProjection(i*20);
+		SPoint vc4(i*20,RandInt(-100,100));
+		SPoint c4=cord.GetCoordinate(vc4.x,vc4.y);
 		while(true)
 		{
 			int j;
@@ -196,7 +202,8 @@ void CBobsMap::MemoryRender(const int cxClient,
 				bool log = m_vecBarriers[j].IsIntersect(c,c4);		
 				if(log)
 				{
-					c4=cord.GetCoordinate(i*10,RandInt(-100,100));
+					vc4=SPoint(i*20,RandInt(-100,100));
+					c4=cord.GetCoordinate(vc4.x,vc4.y);
 					testCount++;
 					break;
 
@@ -219,9 +226,64 @@ void CBobsMap::MemoryRender(const int cxClient,
 		OldPen = (HPEN)SelectObject(surface, RedPen);
 		DrawLine(surface,c,c4);
 		SelectObject(surface, OldPen);
+		
+		//save valid point
+		validPoints.push_back(c4);
+		validYValue.push_back(vc4);
 		c=c4;
 	}
 
+	//fix waypoint
+	SPoint fA,fB,fC;
+	vector<SPoint> fixPoints;
+	fA=m_spA;
+	int	jj=1;
+	for(int i=0;i<(validPoints.size()-1);i+=jj)
+	{
+		fB=validPoints[i];
+		fC=validPoints[i+1];
+		
+		
+		if(abs(validYValue[i+1].y)<abs(validYValue[i].y))
+		{
+			int j;
+			for(j=0;j<MAX_BARRIERS;j++)
+			{
+
+				bool log = m_vecBarriers[j].IsIntersect(fA,fC);	
+				if(log)
+				{
+					fixPoints.push_back(fB);
+					jj=2;
+					fA=fB;
+					break;
+				}
+			}
+			
+			if(j==MAX_BARRIERS)
+			{
+					fixPoints.push_back(fC);
+					OldPen = (HPEN)SelectObject(surface, GreenPen);
+					DrawLine(surface,fA,fC);
+					SelectObject(surface, OldPen);
+					jj=1;
+					fA=fC;
+
+			}
+					
+					
+		}else
+		{
+					OldPen = (HPEN)SelectObject(surface, GreenPen);
+					DrawLine(surface,fA,fB);
+					SelectObject(surface, OldPen);
+
+					jj=1;
+					fA=fB;
+		}
+		
+		
+	}
 
 
 
