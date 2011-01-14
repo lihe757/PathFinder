@@ -192,11 +192,13 @@ void CBobsMap::MemoryRender(const int cxClient,
 	//OldPen	 =	(HPEN)SelectObject(surface, NullPen);
 
 	vector<WayPoint> wayPoint;
+
 	GetOneValidPath(wayPoint);
+
 	Coordinate cord(m_spA,m_spB);
 
 
-	if(false)
+	if(true)
 	{
 
 		SPoint spPre = m_spA;
@@ -425,9 +427,8 @@ bool CBobsMap::IsValidPoint (const SPoint &point)
 
 }
 
-void CBobsMap::GetOneValidPath(vector<WayPoint> &path)
+bool CBobsMap::GetOneValidPath(vector<WayPoint> &path)
 {
-	bool isGiveUp=false;
 	int testCount=0;
 
 	Coordinate cord(m_spA,m_spB);
@@ -455,8 +456,7 @@ void CBobsMap::GetOneValidPath(vector<WayPoint> &path)
 			}
 			if(testCount>100) 
 			{
-				isGiveUp=true;
-				break;
+				return false;
 			}
 			if((j==MAX_BARRIERS)&&IsValidPoint(spPathAbsolute)) break;
 
@@ -464,14 +464,18 @@ void CBobsMap::GetOneValidPath(vector<WayPoint> &path)
 			spPathAbsolute=cord.GetCoordinate(spRelative.x,spRelative.y);
 		}
 
-		if(isGiveUp) break;
+		
 		//save waypoint
 		path.push_back(WayPoint(spPathAbsolute,spRelative));
 		spPre=spPathAbsolute;
+		
+
 	}
 	//push the last point
 	SPoint c44=cord.GetRelativePoint(m_spB.x,m_spB.y);
 	path.push_back(WayPoint(m_spB,c44));
+	
+	return true;
 }
 
 

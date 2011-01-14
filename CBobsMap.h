@@ -82,7 +82,7 @@ public:
 	bool IsValidPoint (const SPoint &point);
 	
 	//lihx gather one valid path
-	void GetOneValidPath(vector<WayPoint> &path);
+	bool GetOneValidPath(vector<WayPoint> &path);
 	
 
 

@@ -111,6 +111,12 @@ void CgaBob::CreateStartPopulation()
 	for (int i=0; i<m_iPopSize; i++)
 	{
 		m_vecGenomes.push_back(SGenome(m_iChromoLength));
+		//lhx
+		//vector<WayPoint> wpoints;
+	
+		//m_BobsMap.GetOneValidPath(wpoints);
+		//	SGenome genome(wpoints);
+
 	}
 
 	//reset all variables
