@@ -407,8 +407,8 @@ CBobsMap::CBobsMap()
 bool CBobsMap::IsValidPoint (const SPoint &point)
 {
 	SPoint pLeftTop(m_recBound.left,m_recBound.top);
-	SPoint pRightTop(m_recBound.left+m_recBound.right,pLeftTop.y);
-	SPoint pLeftButtom(pLeftTop.x,m_recBound.top+m_recBound.bottom);
+	SPoint pRightTop(m_recBound.right,pLeftTop.y);
+	SPoint pLeftButtom(pLeftTop.x,m_recBound.bottom);
 	SPoint pRightButtom(pRightTop.x,pLeftButtom.y);
 
 	
