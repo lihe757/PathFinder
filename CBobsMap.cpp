@@ -92,7 +92,7 @@ void CBobsMap::Render(const int cxClient,
 					  const int cyClient,
 					  HDC surface)
 {
-	const int border = 20;
+	const int border = MAP_BORDER;
 
 	int BlockSizeX = (cxClient - 2*border)/m_iMapWidth;
 	int BlockSizeY = (cyClient - 2*border)/m_iMapHeight;
@@ -163,7 +163,7 @@ void CBobsMap::MemoryRender(const int cxClient,
 							const int cyClient,
 							HDC surface)
 {
-	const int border = 20;
+	const int border = MAP_BORDER;
 	
 	int BlockSizeX = (cxClient - 2*border)/m_iMapWidth;
 	int BlockSizeY = (cyClient - 2*border)/m_iMapHeight;
@@ -401,6 +401,11 @@ CBobsMap::CBobsMap()
 		m_vecBarriers.push_back(CBarrier(m_sp4,m_aBarriesCount[3]));
 		m_vecBarriers.push_back(CBarrier(m_sp5,m_aBarriesCount[4]));
 		m_vecBarriers.push_back(CBarrier(m_sp6,m_aBarriesCount[5]));
+		//lhx bound barriers
+		m_recBound.left=MAP_BORDER;
+		m_recBound.right=WINDOW_WIDTH-2*MAP_BORDER;
+		m_recBound.top=MAP_BORDER;
+		m_recBound.bottom=WINDOW_HEIGHT-2*MAP_BORDER;
 }
 
 
