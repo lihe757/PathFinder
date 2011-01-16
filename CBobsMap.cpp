@@ -198,6 +198,10 @@ void CBobsMap::MemoryRender(const int cxClient,
 	Coordinate cord(m_spA,m_spB);
 
 
+	//push the last point
+	SPoint endPoint=cord.GetRelativePoint(m_spB.x,m_spB.y);
+	wayPoint.push_back(WayPoint(m_spB,endPoint));
+
 	if(true)
 	{
 
@@ -229,13 +233,16 @@ void CBobsMap::MemoryRender(const int cxClient,
 
 	//fix waypoint
 	SPoint fA,fB,fC;
-	vector<SPoint> fixPoints;
+	vector<SPoint> bestPath;
 	fA=m_spA;
+
+	//push start point 
+	bestPath.push_back(m_spA);
 	
 	int i=0;
 	int index=0;
 
-	for(int q=index;q<wayPoint.size();q++)
+	for(int q=0;q<wayPoint.size();q++)
 	{
 	
 		for(i=q;i<wayPoint.size();i++)
@@ -256,8 +263,7 @@ void CBobsMap::MemoryRender(const int cxClient,
 				if(j==MAX_BARRIERS)
 				{
 						fC=fB;
-						index=i;
-						index++;
+						q=i;
 				}
 
 		}
@@ -265,6 +271,8 @@ void CBobsMap::MemoryRender(const int cxClient,
 		OldPen = (HPEN)SelectObject(surface, GreenPen);
 		DrawLine(surface,fA,fC);
 		SelectObject(surface, OldPen);
+
+		bestPath.push_back(fC);
 		fA=fC;
 						
 	}
@@ -476,9 +484,7 @@ bool CBobsMap::GetOneValidPath(vector<WayPoint> &path)
 		
 
 	}
-	//push the last point
-	SPoint c44=cord.GetRelativePoint(m_spB.x,m_spB.y);
-	path.push_back(WayPoint(m_spB,c44));
+
 	
 	return true;
 }
