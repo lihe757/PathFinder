@@ -85,6 +85,8 @@ public:
 	
 	//lihx gather one valid path
 	bool GetOneValidPath(vector<WayPoint> &path);
+	vector<SPoint> FixToBestPath(const vector<WayPoint> &waypoints );
+	float GetPathLength(const vector<SPoint> &path);
 	
 
 

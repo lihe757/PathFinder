@@ -326,12 +326,12 @@ double CBobsMap::TestRoute(const vector<int> &vecPath, CBobsMap &Bobs)
 
 double CBobsMap::TestRoute2(const vector<WayPoint> &vecPath, CBobsMap &memory)
 {
-	m_vecWayPoints=vecPath;
+	memory.m_vecWayPoints=vecPath;
 
 	Coordinate cord(m_spA,m_spB);
 	//push the last point
 	SPoint endPoint=cord.GetRelativePoint(m_spB.x,m_spB.y);
-	m_vecWayPoints.push_back(WayPoint(m_spB,endPoint));
+	memory.m_vecWayPoints.push_back(WayPoint(m_spB,endPoint));
 	//fix waypoint
 	SPoint fA,fB,fC;
 	vector<SPoint> bestPath;
@@ -343,18 +343,18 @@ double CBobsMap::TestRoute2(const vector<WayPoint> &vecPath, CBobsMap &memory)
 	int i=0;
 	int index=0;
 
-	for(int q=0;q<m_vecWayPoints.size();q++)
+	for(int q=0;q<memory.m_vecWayPoints.size();q++)
 	{
 
-		for(i=q;i<m_vecWayPoints.size();i++)
+		for(i=q;i<memory.m_vecWayPoints.size();i++)
 		{
-			fB=m_vecWayPoints[i].absoluteXY;
+			fB=memory.m_vecWayPoints[i].absoluteXY;
 
 			int j;
 			for(j=0;j<MAX_BARRIERS;j++)
 			{
 
-				bool log = m_vecBarriers[j].IsIntersect(fA,fB);	
+				bool log = memory.m_vecBarriers[j].IsIntersect(fA,fB);	
 				if(log)
 				{
 					break;
@@ -375,6 +375,9 @@ double CBobsMap::TestRoute2(const vector<WayPoint> &vecPath, CBobsMap &memory)
 	}
 
 
+
+
+
 	float fTotalLength=0;
 	vector<SPoint>::const_iterator iter = bestPath.begin();
 
@@ -382,7 +385,7 @@ double CBobsMap::TestRoute2(const vector<WayPoint> &vecPath, CBobsMap &memory)
 	iter++;
 	while(iter!= bestPath.end())
 	{
-		SPoint end = *(iter);
+		SPoint end = *iter;
 		fTotalLength += start.DistanceToMe(end);
 		start = end;
 		iter++;
@@ -503,3 +506,73 @@ bool CBobsMap::GetOneValidPath(vector<WayPoint> &path)
 
 
 
+vector<SPoint> CBobsMap::FixToBestPath(const vector<WayPoint> &waypoints)
+{
+
+	vector<WayPoint> vecPath=waypoints;
+	Coordinate cord(m_spA,m_spB);
+	//push the last point
+	SPoint endPoint=cord.GetRelativePoint(m_spB.x,m_spB.y);
+	vecPath.push_back(WayPoint(m_spB,endPoint));
+	
+	//fix waypoint
+	SPoint fA,fB,fC;
+	fA=m_spA;
+
+	vector<SPoint>bestPath;
+	//push start point 
+	bestPath.push_back(m_spA);
+
+	int i=0;
+	int index=0;
+
+	for(int q=0;q<vecPath.size();q++)
+	{
+
+		for(i=q;i<vecPath.size();i++)
+		{
+			fB=vecPath[i].absoluteXY;
+
+			int j;
+			for(j=0;j<MAX_BARRIERS;j++)
+			{
+
+				bool log = m_vecBarriers[j].IsIntersect(fA,fB);	
+				if(log)
+				{
+					break;
+				}
+			}
+
+			if(j==MAX_BARRIERS)
+			{
+				fC=fB;
+				q=i;
+			}
+
+		}
+
+		bestPath.push_back(fC);
+		fA=fC;
+	}
+
+	return bestPath;
+}
+
+float  CBobsMap::GetPathLength(const vector<SPoint> &path)
+{
+
+	float fTotalLength=0;
+	vector<SPoint>::const_iterator iter = path.begin();
+
+	SPoint start =*iter;
+	iter++;
+	while(iter!= path.end())
+	{
+		SPoint end = *iter;
+		fTotalLength += start.DistanceToMe(end);
+		start = end;
+		iter++;
+	}
+	return fTotalLength;
+}

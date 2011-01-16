@@ -31,6 +31,8 @@ struct SGenome
 	vector<int> vecBits;
 	//lihx
 	vector<WayPoint> vecWayPoint;
+	//fixed path point
+	vector<SPoint> vecFixedPoint;
 	
 	double		dFitness;
 	
@@ -81,6 +83,9 @@ private:
 	double          m_dBestFitnessScore;
 	
 	double          m_dTotalFitnessScore;
+	//lihx
+	float			m_fLongestRoute;
+	float			m_fShortestRoute;
 	
 	int             m_iGeneration;
 
@@ -132,6 +137,8 @@ public:
                           m_dTotalFitnessScore(0.0),
                           m_iGeneration(0),
                           m_iGeneLength(gene_len),
+						  m_fLongestRoute(0),
+						  m_fShortestRoute(9999.0),
                           m_bBusy(false)
 		
 	{

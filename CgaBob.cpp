@@ -142,34 +142,35 @@ void CgaBob::Epoch()
 	
 	UpdateFitnessScores();
 
-	////Now to create a new population
-	//int NewBabies = 0;
+	//Now to create a new population
+	int NewBabies = 0;
 
-	////create some storage for the baby genomes 
-	//vector<SGenome> vecBabyGenomes;
+	//create some storage for the baby genomes 
+	vector<SGenome> vecBabyGenomes;
 
-	//while (NewBabies < m_iPopSize)
-	//{
-	//	//select 2 parents
-	//	SGenome mum = RouletteWheelSelection();
-	//	SGenome dad = RouletteWheelSelection();
+	while (NewBabies < m_iPopSize)
+	{
+		//select 2 parents
+		SGenome mum = RouletteWheelSelection();
+		SGenome dad = RouletteWheelSelection();
+		m_BobsBrain.m_vecWayPoints = mum.vecWayPoint;
 
-	//	//operator - crossover
-	//	SGenome baby1, baby2;
-	//	Crossover(mum.vecBits, dad.vecBits, baby1.vecBits, baby2.vecBits);
+		//operator - crossover
+		//SGenome baby1, baby2;
+		//Crossover(mum.vecBits, dad.vecBits, baby1.vecBits, baby2.vecBits);
 
-	//	//operator - mutate
-	//	Mutate(baby1.vecBits);
-	//	Mutate(baby2.vecBits);
+		//operator - mutate
+		//Mutate(baby1.vecBits);
+		//Mutate(baby2.vecBits);
 
-	//	//add to new population
-	//	vecBabyGenomes.push_back(baby1);
-	//	vecBabyGenomes.push_back(baby2);
+		//add to new population
+		//vecBabyGenomes.push_back(baby1);
+		//vecBabyGenomes.push_back(baby2);
 
-	//	NewBabies += 2;
-	//}
+		NewBabies += 2;
+	}
 
-	////copy babies back into starter population
+	//copy babies back into starter population
 	//m_vecGenomes = vecBabyGenomes;
 
 	//increment the generation counter
@@ -202,31 +203,60 @@ void CgaBob::UpdateFitnessScores()
 		//get it's fitness score
 		//m_vecGenomes[i].dFitness = m_BobsMap.TestRoute(vecDirections, TempMemory);
 		//lhx
-		m_vecGenomes[i].dFitness = m_BobsMap.TestRoute2(vecWayPoints, TempMemory);
+		//m_vecGenomes[i].dFitness = m_BobsMap.TestRoute2(vecWayPoints, TempMemory);
+		m_vecGenomes[i].vecFixedPoint =m_BobsMap.FixToBestPath(vecWayPoints);
+			//calculate the tourlength for each chromosome
+		float TourLength = m_BobsMap.GetPathLength(m_vecGenomes[i].vecFixedPoint);
 
-		//update total
-		m_dTotalFitnessScore += m_vecGenomes[i].dFitness;
-
-		//if this is the fittest genome found so far, store results
-		if (m_vecGenomes[i].dFitness > m_dBestFitnessScore)
+		m_vecGenomes[i].dFitness = TourLength;
+		
+		//keep a track of the shortest route found each generation
+		if (TourLength < m_fShortestRoute)
 		{
-			m_dBestFitnessScore = m_vecGenomes[i].dFitness;
+			m_fShortestRoute = TourLength;
 
 			m_iFittestGenome = i;
-
-			m_BobsBrain = TempMemory;
-
-			//Has Bob found the exit?
-			if (m_vecGenomes[i].dFitness == 1)
-			{
-				//is so, stop the run
-				m_bBusy = false;
-			}
+		}
+		
+		//keep a track of the worst tour each generation
+		if (TourLength > m_fLongestRoute)
+		{
+			m_fLongestRoute = TourLength;
 		}
 
-		TempMemory.ResetMemory();
+		////update total
+		//m_dTotalFitnessScore += m_vecGenomes[i].dFitness;
+
+		////if this is the fittest genome found so far, store results
+		//if (m_vecGenomes[i].dFitness > m_dBestFitnessScore)
+		//{
+		//	m_dBestFitnessScore = m_vecGenomes[i].dFitness;
+
+		//	m_iFittestGenome = i;
+
+		//	m_BobsBrain = TempMemory;
+
+		//	//Has Bob found the exit?
+		//	if (m_vecGenomes[i].dFitness == 1)
+		//	{
+		//		//is so, stop the run
+		//		m_bBusy = false;
+		//	}
+		//}
+
+		//TempMemory.ResetMemory();
 	
 	}//next genome
+
+	
+	//Now we have calculated all the tour lengths we can assign
+	//the fitness scores
+	for (int i=0; i<m_iPopSize; ++i)
+	{
+		m_vecGenomes[i].dFitness = 
+		m_fLongestRoute - m_vecGenomes[i].dFitness;
+		m_dTotalFitnessScore +=m_vecGenomes[i].dFitness;
+	}
 }
 
 //---------------------------Decode-------------------------------------
