@@ -62,6 +62,7 @@ public:
 	//lihx  diagonal length
 	float				 m_fDiagonalLength;
 	RECT				 m_recBound;
+	vector<WayPoint>	 m_vecWayPoints;
 
 	CBobsMap();
 	
@@ -69,6 +70,7 @@ public:
 	//can get. Returns a fitness score proportional to the 
 	//distance reached from the exit.
 	double TestRoute(const vector<int> &vecPath, CBobsMap &memory);
+	double TestRoute2(const vector<WayPoint> &vecPath, CBobsMap &memory);
 
 	//given a surface to draw on this function uses the windows GDI
 	//to display the map.

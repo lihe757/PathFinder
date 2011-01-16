@@ -191,9 +191,9 @@ void CBobsMap::MemoryRender(const int cxClient,
 	OldBrush = (HBRUSH)SelectObject(surface, GreyBrush);
 	//OldPen	 =	(HPEN)SelectObject(surface, NullPen);
 
-	vector<WayPoint> wayPoint;
+	//vector<WayPoint> wayPoint;
 
-	GetOneValidPath(wayPoint);
+	//GetOneValidPath(wayPoint);
 
 	Coordinate cord(m_spA,m_spB);
 
@@ -202,8 +202,8 @@ void CBobsMap::MemoryRender(const int cxClient,
 	{
 
 		SPoint spPre = m_spA;
-		vector<WayPoint>::const_iterator iter = wayPoint.begin();
-		while(iter != wayPoint.end())
+		vector<WayPoint>::const_iterator iter = m_vecWayPoints.begin();
+		while(iter != m_vecWayPoints.end())
 		{
 			
 			SPoint spRelative =iter->relativeXY;
@@ -227,47 +227,7 @@ void CBobsMap::MemoryRender(const int cxClient,
 
 
 
-	//fix waypoint
-	SPoint fA,fB,fC;
-	vector<SPoint> fixPoints;
-	fA=m_spA;
 	
-	int i=0;
-	int index=0;
-
-	for(int q=index;q<wayPoint.size();q++)
-	{
-	
-		for(i=q;i<wayPoint.size();i++)
-		{
-			fB=wayPoint[i].absoluteXY;
-		
-				int j;
-				for(j=0;j<MAX_BARRIERS;j++)
-				{
-
-					bool log = m_vecBarriers[j].IsIntersect(fA,fB);	
-					if(log)
-					{
-						break;
-					}
-				}
-				
-				if(j==MAX_BARRIERS)
-				{
-						fC=fB;
-						index=i;
-						index++;
-				}
-
-		}
-							
-		OldPen = (HPEN)SelectObject(surface, GreenPen);
-		DrawLine(surface,fA,fC);
-		SelectObject(surface, OldPen);
-		fA=fC;
-						
-	}
 
 
 
@@ -375,6 +335,70 @@ double CBobsMap::TestRoute(const vector<int> &vecPath, CBobsMap &Bobs)
 	return 1/(double)(DiffX+DiffY+1);
 }
 
+double CBobsMap::TestRoute2(const vector<WayPoint> &vecPath, CBobsMap &memory)
+{
+	m_vecWayPoints=vecPath;
+	//fix waypoint
+	SPoint fA,fB,fC;
+	vector<SPoint> fixPoints;
+	fA=m_spA;
+	
+	fixPoints.push_back(fA);
+	int i=0;
+	int index=0;
+
+	for(int q=index;q<m_vecWayPoints.size()-1;q++)
+	{
+	
+		for(i=q;i<m_vecWayPoints.size();i++)
+		{
+			fB=m_vecWayPoints[i].absoluteXY;
+		
+				int j;
+				for(j=0;j<MAX_BARRIERS;j++)
+				{
+
+					bool log = m_vecBarriers[j].IsIntersect(fA,fB);	
+					if(log)
+					{
+						break;
+					}
+				}
+				
+				if(j==MAX_BARRIERS)
+				{
+						fC=fB;
+						index=i;
+						index++;
+				}
+
+		}
+							
+		//OldPen = (HPEN)SelectObject(surface, GreenPen);
+		//DrawLine(surface,fA,fC);
+		//SelectObject(surface, OldPen);
+
+		fixPoints.push_back(fC);
+
+		fA=fC;
+						
+	}
+
+	float fTotalLength=0;
+	vector<SPoint>::const_iterator iter = fixPoints.begin();
+
+	while(iter!= fixPoints.end())
+	{
+		SPoint start=*iter;
+		SPoint end = *(++iter);
+		fTotalLength += start.DistanceToMe(end);
+	}
+
+	float fitness = 200/fTotalLength;
+	
+	return RandFloat();
+}
+
 //--------------------- ResetMemory --------------------------
 //
 //	resets the memory map to zeros
@@ -403,9 +427,9 @@ CBobsMap::CBobsMap()
 		m_vecBarriers.push_back(CBarrier(m_sp6,m_aBarriesCount[5]));
 		//lhx bound barriers
 		m_recBound.left=MAP_BORDER;
-		m_recBound.right=WINDOW_WIDTH-2*MAP_BORDER;
+		m_recBound.right=WINDOW_WIDTH-MAP_BORDER;
 		m_recBound.top=MAP_BORDER;
-		m_recBound.bottom=WINDOW_HEIGHT-2*MAP_BORDER;
+		m_recBound.bottom=WINDOW_HEIGHT-MAP_BORDER;
 }
 
 

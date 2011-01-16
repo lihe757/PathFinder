@@ -65,6 +65,10 @@ struct SPoint
 		y =sp.y;
 		return *this;
 	}
+	float DistanceToMe(const SPoint &p)
+	{
+		return (float) sqrt((x-p.x)*(x-p.x)+(y-p.y)*(y-p.y));
+	}
 };
 
 

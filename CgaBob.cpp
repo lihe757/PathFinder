@@ -110,12 +110,17 @@ void CgaBob::CreateStartPopulation()
 	
 	for (int i=0; i<m_iPopSize; i++)
 	{
-		m_vecGenomes.push_back(SGenome(m_iChromoLength));
+		//m_vecGenomes.push_back(SGenome(m_iChromoLength));
+		
 		//lhx
 		vector<WayPoint> wpoints;
-		while(!m_BobsMap.GetOneValidPath(wpoints));
+		while(!m_BobsMap.GetOneValidPath(wpoints))
+		{
+			wpoints.clear();
+		}
 		
-			SGenome genome(wpoints);
+		m_vecGenomes.push_back(SGenome (wpoints));
+
 
 	}
 
@@ -137,35 +142,35 @@ void CgaBob::Epoch()
 	
 	UpdateFitnessScores();
 
-	//Now to create a new population
-	int NewBabies = 0;
+	////Now to create a new population
+	//int NewBabies = 0;
 
-	//create some storage for the baby genomes 
-	vector<SGenome> vecBabyGenomes;
+	////create some storage for the baby genomes 
+	//vector<SGenome> vecBabyGenomes;
 
-	while (NewBabies < m_iPopSize)
-	{
-		//select 2 parents
-		SGenome mum = RouletteWheelSelection();
-		SGenome dad = RouletteWheelSelection();
+	//while (NewBabies < m_iPopSize)
+	//{
+	//	//select 2 parents
+	//	SGenome mum = RouletteWheelSelection();
+	//	SGenome dad = RouletteWheelSelection();
 
-		//operator - crossover
-		SGenome baby1, baby2;
-		Crossover(mum.vecBits, dad.vecBits, baby1.vecBits, baby2.vecBits);
+	//	//operator - crossover
+	//	SGenome baby1, baby2;
+	//	Crossover(mum.vecBits, dad.vecBits, baby1.vecBits, baby2.vecBits);
 
-		//operator - mutate
-		Mutate(baby1.vecBits);
-		Mutate(baby2.vecBits);
+	//	//operator - mutate
+	//	Mutate(baby1.vecBits);
+	//	Mutate(baby2.vecBits);
 
-		//add to new population
-		vecBabyGenomes.push_back(baby1);
-		vecBabyGenomes.push_back(baby2);
+	//	//add to new population
+	//	vecBabyGenomes.push_back(baby1);
+	//	vecBabyGenomes.push_back(baby2);
 
-		NewBabies += 2;
-	}
+	//	NewBabies += 2;
+	//}
 
-	//copy babies back into starter population
-	m_vecGenomes = vecBabyGenomes;
+	////copy babies back into starter population
+	//m_vecGenomes = vecBabyGenomes;
 
 	//increment the generation counter
 	++m_iGeneration;
@@ -190,10 +195,14 @@ void CgaBob::UpdateFitnessScores()
 	for (int i=0; i<m_iPopSize; ++i)
 	{
 		//decode each genomes chromosome into a vector of directions
-		vector<int> vecDirections = Decode(m_vecGenomes[i].vecBits);
+		//vector<int> vecDirections = Decode(m_vecGenomes[i].vecBits);
+		//lhx
+		vector<WayPoint> vecWayPoints=m_vecGenomes[i].vecWayPoint;
 
 		//get it's fitness score
-		m_vecGenomes[i].dFitness = m_BobsMap.TestRoute(vecDirections, TempMemory);
+		//m_vecGenomes[i].dFitness = m_BobsMap.TestRoute(vecDirections, TempMemory);
+		//lhx
+		m_vecGenomes[i].dFitness = m_BobsMap.TestRoute2(vecWayPoints, TempMemory);
 
 		//update total
 		m_dTotalFitnessScore += m_vecGenomes[i].dFitness;
