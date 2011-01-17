@@ -59,10 +59,10 @@ const SPoint CBobsMap::m_sp5[BARRIER_COUNT5]=
 };
 const SPoint CBobsMap::m_sp6[BARRIER_COUNT6]=
 {
-	SPoint(107,118),
-	SPoint(107,138),
-	SPoint(142,138),
-	SPoint(142,118),
+	SPoint(147,118),
+	SPoint(147,138),
+	SPoint(182,138),
+	SPoint(182,118),
 	
 };
 
@@ -372,8 +372,8 @@ vector<SPoint> CBobsMap::FixToBestPath(const vector<WayPoint> &waypoints)
 	vecPath.push_back(WayPoint(m_spB,endPoint));
 	
 	//fix waypoint
-	SPoint fA,fB,fC;
-	fA=m_spA;
+	SPoint preAbs,fBRel,fCRel,fAbs;
+	preAbs=m_spA;
 
 	vector<SPoint>bestPath;
 	//push start point 
@@ -382,24 +382,28 @@ vector<SPoint> CBobsMap::FixToBestPath(const vector<WayPoint> &waypoints)
 	int i=0;
 	int index=0;
 
-	for(int q=0;q<vecPath.size();q++)
+	for(int q=0;q<vecPath.size()-1;q++)
 	{
-
-		for(i=q;i<vecPath.size();i++)
+		fBRel=vecPath[q].relativeXY;
+		fAbs =vecPath[q].absoluteXY;
+		for(i=q+1;i<vecPath.size();i++)
 		{
-			fB=vecPath[i].absoluteXY;
-
-			bool log = BarrierIntersection(fA,fB);
-			if(!log)
+			fCRel=vecPath[i].relativeXY;
+			
+			if(abs(fBRel.y)>abs(fCRel.y))
 			{
-				fC=fB;
-				q=i;
-			}
-				
+				bool log = BarrierIntersection(preAbs,vecPath[i].absoluteXY);
+				if(!log)
+				{
+					fBRel = fCRel;
+					fAbs =vecPath[i].absoluteXY;
+					q=i;
+				}
+			}	
 		}
 
-		bestPath.push_back(fC);
-		fA=fC;
+		bestPath.push_back(fAbs);
+		preAbs=fAbs;
 	}
 
 	return bestPath;
