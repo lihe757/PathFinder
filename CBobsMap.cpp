@@ -109,11 +109,6 @@ void CBobsMap::Render(const int cxClient,
 	//grab a brush to fill our cells with
 	BlackBrush = (HBRUSH)GetStockObject(BLACK_BRUSH);
 
-
-
-
-
-
 	Rectangle(surface, m_recBound.left, m_recBound.top , m_recBound.right, m_recBound.bottom);
 	//grab DiagonalLength
 	m_fDiagonalLength = sqrt((float)(m_recBound.right*m_recBound.right)+(m_recBound.bottom*m_recBound.bottom));
@@ -147,10 +142,9 @@ void CBobsMap::MemoryRender2(const int cxClient,
 							const vector<WayPoint> &wayPoint)
 {
 	
-	HPEN	OldPen,RedPen;
+
 	//grab a red pen 
-	RedPen = CreatePen(PS_SOLID, 1, RGB(255, 0, 0));
-	OldPen = (HPEN)SelectObject(surface, RedPen);
+	m_OldPen = (HPEN)SelectObject(surface,m_RedPen);
 
 	Coordinate cord(m_spA,m_spB);
 
@@ -179,7 +173,7 @@ void CBobsMap::MemoryRender2(const int cxClient,
 		}
 			DrawLine(surface,spPre,m_spB);
 	}
-			SelectObject(surface, OldPen);	
+			SelectObject(surface, m_OldPen);	
 
 
 }
@@ -191,10 +185,8 @@ void CBobsMap::MemoryRender3(const int cxClient,
 {
 	if(bestPath.size()<2) return ;
 
-	HPEN	OldPen,GreenPen;
 	//grab a green pen 
-	GreenPen = CreatePen(PS_SOLID, 1, RGB(0,255, 0));
-	OldPen	 =	(HPEN)SelectObject(surface, GreenPen);
+	m_OldPen = (HPEN)SelectObject(surface, m_GreenPen);
 
 	vector<SPoint>::const_iterator siter = bestPath.begin();
 	SPoint prePoint = *siter;
@@ -207,7 +199,7 @@ void CBobsMap::MemoryRender3(const int cxClient,
 	}
 	
 	//restore the original brush
-	SelectObject(surface, OldPen);
+	SelectObject(surface, m_OldPen);
 }
 
 
@@ -242,6 +234,10 @@ CBobsMap::CBobsMap()
 		m_recBound.right=WINDOW_WIDTH-MAP_BORDER;
 		m_recBound.top=MAP_BORDER;
 		m_recBound.bottom=WINDOW_HEIGHT-MAP_BORDER;
+		//lhx grab pens
+		m_GreenPen = CreatePen(PS_SOLID, 1, RGB(0,255, 0));
+		m_RedPen = CreatePen(PS_SOLID, 1, RGB(255, 0, 0));
+
 }
 
 
@@ -281,7 +277,7 @@ bool CBobsMap::GetOneValidPath(vector<WayPoint> &path)
 	for(int i=1;i<=count;i++)
 	{
 		SPoint spRoot=cord.GetXProjection(i*20);
-		SPoint spRelative(i*20,RandInt(-100,100));
+		SPoint spRelative(i*20,RandInt(-150,150));
 		SPoint spPathAbsolute=cord.GetCoordinate(spRelative.x,spRelative.y);
 		while(true)
 		{			
@@ -299,7 +295,7 @@ bool CBobsMap::GetOneValidPath(vector<WayPoint> &path)
 				}
 			}
 			
-			spRelative=SPoint(i*20,RandInt(-100,100));
+			spRelative=SPoint(i*20,RandInt(-150,150));
 			spPathAbsolute=cord.GetCoordinate(spRelative.x,spRelative.y);
 		}	
 		//save waypoint

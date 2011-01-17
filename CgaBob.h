@@ -92,8 +92,6 @@ private:
 	bool			m_bBusy;
 	
 
-	
-	void        Mutate(vector<int> &vecBits);
 	void		Mutate2(vector<WayPoint> &vecWayPoint);
 
 	void        Crossover2(const vector<WayPoint>	&mum,

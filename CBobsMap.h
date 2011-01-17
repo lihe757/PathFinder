@@ -53,6 +53,11 @@ private:
 	static const int	m_iEndX;
 	static const int	m_iEndY;
 
+	//lhx
+	 HPEN				 m_OldPen ;
+	 HPEN				 m_GreenPen;
+	 HPEN				 m_RedPen;
+
 
 public:
 
@@ -62,7 +67,7 @@ public:
 	//lihx  diagonal length
 	float				 m_fDiagonalLength;
 	RECT				 m_recBound;
-	vector<WayPoint>	 m_vecWayPoints;
+
 
 	CBobsMap();
 	

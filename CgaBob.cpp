@@ -34,18 +34,6 @@ SGenome& CgaBob::RouletteWheelSelection()
 //	iterates through each genome flipping the bits acording to the
 //	mutation rate
 //--------------------------------------------------------------------
-void CgaBob::Mutate(vector<int> &vecBits)
-{
-	for (int curBit=0; curBit<vecBits.size(); curBit++)
-	{
-		//do we flip this bit?
-		if (RandFloat() < m_dMutationRate)
-		{
-			//flip the bit
-			vecBits[curBit] = !vecBits[curBit];
-		}
-	}//next bit
-}
 void CgaBob::Mutate2(vector<WayPoint> &vecWayPoint)
 {
 	for (int curBit=0; curBit<vecWayPoint.size(); curBit++)
@@ -54,7 +42,7 @@ void CgaBob::Mutate2(vector<WayPoint> &vecWayPoint)
 		if (RandFloat() < m_dMutationRate)
 		{
 			//flip the bit
-			vecWayPoint[curBit].relativeXY.y +=RandInt(-100,100)*RandFloat();
+			vecWayPoint[curBit].relativeXY.y +=RandInt(-50,50)*RandFloat();
 			SPoint rand = vecWayPoint[curBit].relativeXY;
 			vecWayPoint[curBit].absoluteXY=m_BobsMap.TransRelativePointToAbusolutePoint(rand);
 		}
@@ -293,6 +281,6 @@ void CgaBob::Render(int cxClient, int cyClient, HDC surface)
 		TextOut(surface, cxClient/2 - (Start.size() * 3), cyClient - 20, Start.c_str(), Start.size());
 	}
 
-	if(m_iGeneration>=30) Stop();
+	//if(m_iGeneration>=30) Stop();
 	
 }
