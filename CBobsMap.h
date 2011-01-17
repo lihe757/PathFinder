@@ -69,24 +69,31 @@ public:
 	//takes a string of directions and see's how far Bob
 	//can get. Returns a fitness score proportional to the 
 	//distance reached from the exit.
-	double TestRoute(const vector<int> &vecPath, CBobsMap &memory);
-	double TestRoute2(const vector<WayPoint> &vecPath, CBobsMap &memory);
+
+	//double TestRoute(const vector<int> &vecPath, CBobsMap &memory);
 
 	//given a surface to draw on this function uses the windows GDI
 	//to display the map.
 	void Render(const int cxClient, const int cyClient, HDC surface);
 
 	//draws whatever path may be stored in the memory
-	void MemoryRender(const int cxClient, const int cyClient, HDC surface);
+		
+	void MemoryRender2(const int cxClient, const int cyClient, HDC surface,const vector<WayPoint> &wayPoint);
+	void MemoryRender3(const int cxClient, const int cyClient, HDC surface,const vector<SPoint> &bestPath);
 
 	void ResetMemory();
 
 	bool IsValidPoint (const SPoint &point);
+	bool BarrierIntersection(const SPoint &a,const SPoint &b);
 	
 	//lihx gather one valid path
 	bool GetOneValidPath(vector<WayPoint> &path);
 	vector<SPoint> FixToBestPath(const vector<WayPoint> &waypoints );
+	//calculate invlid point count
+	int CalculateInvalidPointCount(const vector<WayPoint> &waypoints);
 	float GetPathLength(const vector<SPoint> &path);
+
+	SPoint TransRelativePointToAbusolutePoint(const SPoint& src);
 	
 
 

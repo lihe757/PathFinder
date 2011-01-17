@@ -104,31 +104,23 @@ void CBobsMap::Render(const int cxClient,
 	m_recBound.bottom=rectan.bottom;
 
 
-	HBRUSH	BlackBrush, RedBrush, OldBrush;
-	HPEN	NullPen, OldPen,RedPen;
-
-	//grab a null pen so we can see the outlines of the cells
-	NullPen = (HPEN)GetStockObject(BLACK_PEN);
-
-	//grab a red pen 
-	RedPen = CreatePen(PS_SOLID, 1, RGB(255, 0, 0));
+	HBRUSH	BlackBrush, OldBrush;
 
 	//grab a brush to fill our cells with
 	BlackBrush = (HBRUSH)GetStockObject(BLACK_BRUSH);
 
-	//create a brush for the exit/entrance points
-	RedBrush = CreateSolidBrush(RGB(255,0,0));
 
-	//select them into the device conext
-	OldBrush = (HBRUSH)SelectObject(surface, BlackBrush);
-	OldPen	 =	 (HPEN)SelectObject(surface, NullPen);
 
-	//draw eadge lhx
-	HBRUSH NullBrush = (HBRUSH)GetStockObject(NULL_BRUSH);
-	SelectObject(surface, NullBrush);
+
+
+
 	Rectangle(surface, m_recBound.left, m_recBound.top , m_recBound.right, m_recBound.bottom);
 	//grab DiagonalLength
 	m_fDiagonalLength = sqrt((float)(m_recBound.right*m_recBound.right)+(m_recBound.bottom*m_recBound.bottom));
+	
+	
+	//select them into the device conext
+	OldBrush = (HBRUSH)SelectObject(surface, BlackBrush);
 	//draw barriers
 	for(int i=0;i<MAX_BARRIERS;i++)
 	{
@@ -143,62 +135,31 @@ void CBobsMap::Render(const int cxClient,
 	string End = "B("+itos(m_spB.x)+string(",")+itos(m_spB.y)+string(")");	
 	TextOut(surface, m_spB.x+20,m_spB.y+20, End.c_str(), End.size());
 
-
-
-
-
-
 	//restore the original brush
 	SelectObject(surface, OldBrush);
 
-	//and pen
-	SelectObject(surface, OldPen);
 }
 
-//-------------------------------MemoryRender ------------------------
-//
-//	//draws whatever path may be stored in the memory
-//--------------------------------------------------------------------
-void CBobsMap::MemoryRender(const int cxClient,
-							const int cyClient,
-							HDC surface)
-{
-	const int border = MAP_BORDER;
-	
-	int BlockSizeX = (cxClient - 2*border)/m_iMapWidth;
-	int BlockSizeY = (cyClient - 2*border)/m_iMapHeight;
 
-	RECT rectan ={border,border,cxClient-border, cyClient-border};
-	m_recBound.left=rectan.left;
-	m_recBound.right=rectan.right;
-	m_recBound.top=rectan.top;
-	m_recBound.bottom=rectan.bottom;
+void CBobsMap::MemoryRender2(const int cxClient,
+							const int cyClient,
+							HDC surface,
+							const vector<WayPoint> &wayPoint)
+{
 	
-	HBRUSH	GreyBrush, OldBrush;
-	HPEN	NullPen, OldPen,RedPen,GreenPen;
-	
-	//grab a brush to fill our cells with
-	GreyBrush = (HBRUSH)GetStockObject(LTGRAY_BRUSH);
+	HPEN	OldPen,RedPen;
 	//grab a red pen 
 	RedPen = CreatePen(PS_SOLID, 1, RGB(255, 0, 0));
-	//grab a green pen 
-	GreenPen = CreatePen(PS_SOLID, 1, RGB(0,255, 0));
-
-	//grab a pen
-	//NullPen = (HPEN)GetStockObject(NULL_PEN);
-	
-	//select them into the device conext
-	OldBrush = (HBRUSH)SelectObject(surface, GreyBrush);
-	//OldPen	 =	(HPEN)SelectObject(surface, NullPen);
+	OldPen = (HPEN)SelectObject(surface, RedPen);
 
 	Coordinate cord(m_spA,m_spB);
 
+	//draw orginin path in red pen
 	if(true)
 	{
-
 		SPoint spPre = m_spA;
-		vector<WayPoint>::const_iterator iter = m_vecWayPoints.begin();
-		while(iter != m_vecWayPoints.end())
+		vector<WayPoint>::const_iterator iter = wayPoint.begin();
+		while(iter != wayPoint.end())
 		{
 			
 			SPoint spRelative =iter->relativeXY;
@@ -207,194 +168,48 @@ void CBobsMap::MemoryRender(const int cxClient,
 			SPoint spPathAbsolute = iter->absoluteXY;
 
 			//draw zhu zi
-			DrawLine(surface,spRoot,spPathAbsolute);
+			//DrawLine(surface,spRoot,spPathAbsolute);
 			//draw line to connect spPre and spPathAbsolute
-			OldPen = (HPEN)SelectObject(surface, RedPen);
+
 			DrawLine(surface,spPre,spPathAbsolute);
-			SelectObject(surface, OldPen);
+
 
 			spPre =spPathAbsolute;
 			iter++;
 		}
-
+			DrawLine(surface,spPre,m_spB);
 	}
-		
+			SelectObject(surface, OldPen);	
 
-	//restore the original brush
-	SelectObject(surface, OldBrush);
+
+}
+
+void CBobsMap::MemoryRender3(const int cxClient,
+							const int cyClient,
+							HDC surface,
+							const vector<SPoint> &bestPath)
+{
+	if(bestPath.size()<2) return ;
+
+	HPEN	OldPen,GreenPen;
+	//grab a green pen 
+	GreenPen = CreatePen(PS_SOLID, 1, RGB(0,255, 0));
+	OldPen	 =	(HPEN)SelectObject(surface, GreenPen);
+
+	vector<SPoint>::const_iterator siter = bestPath.begin();
+	SPoint prePoint = *siter;
+	siter++;
+	while(siter!= bestPath.end())
+	{
+		DrawLine(surface,prePoint,*siter);
+		prePoint=*siter;
+		siter++;
+	}
 	
-	//and pen
-	//SelectObject(surface, OldPen);
-
+	//restore the original brush
+	SelectObject(surface, OldPen);
 }
 
-//---------------------------- TestRoute ---------------------------
-//
-//	given a decoded vector of directions and a map object representing
-//	Bob's memory, this function moves Bob through the maze as far as 
-//	he can go updating his memory as he moves.
-//-------------------------------------------------------------------
-double CBobsMap::TestRoute(const vector<int> &vecPath, CBobsMap &Bobs)
-{
-	int posX = m_iStartX;
-	int posY = m_iStartY;
-
-	for (int dir=0; dir<vecPath.size(); ++dir)
-	{
-		int NextDir = vecPath[dir];
-
-		switch(vecPath[dir])
-		{
-		case 0: //North
-
-			//check within bounds and that we can move
-			if ( ((posY-1) < 0 ) || (map[posY-1][posX] == 1) )
-			{
-				break;
-			}
-
-			else
-			{
-				posY -= 1;
-			}
-
-			break;
-
-		case 1: //South
-
-			//check within bounds and that we can move
-			if ( ((posY+1) >= m_iMapHeight) || (map[posY+1][posX] == 1) )
-			{
-				break;
-			}
-			
-			else
-			{
-				posY += 1;
-			}
-
-			break;
-
-		case 2: //East
-
-			//check within bounds and that we can move
-			if ( ((posX+1) >= m_iMapWidth ) || (map[posY][posX+1] == 1) )
-			{
-				break;
-			}
-			
-			else
-			{
-				posX += 1;
-			}
-
-			break;
-
-		case 3: //West
-
-			//check within bounds and that we can move
-			if ( ((posX-1) < 0 ) || (map[posY][posX-1] == 1) )
-			{
-				break;
-			}
-			
-			else
-			{
-				posX -= 1;
-			}
-
-			break;
-
-		}//end switch
-
-		//mark the route in the memory array
-		Bobs.memory[posY][posX] = 1;
-
-	}//next direction
-
-	//now we know the finish point of Bobs journey, let's assign
-	//a fitness score which is proportional to his distance from
-	//the exit
-
-	int	DiffX = abs(posX - m_iEndX);
-	int DiffY = abs(posY - m_iEndY);
-
-	//we add the one to ensure we never divide by zero. Therefore
-	//a solution has been found when this return value = 1
-	return 1/(double)(DiffX+DiffY+1);
-}
-
-double CBobsMap::TestRoute2(const vector<WayPoint> &vecPath, CBobsMap &memory)
-{
-	memory.m_vecWayPoints=vecPath;
-
-	Coordinate cord(m_spA,m_spB);
-	//push the last point
-	SPoint endPoint=cord.GetRelativePoint(m_spB.x,m_spB.y);
-	memory.m_vecWayPoints.push_back(WayPoint(m_spB,endPoint));
-	//fix waypoint
-	SPoint fA,fB,fC;
-	vector<SPoint> bestPath;
-	fA=m_spA;
-
-	//push start point 
-	bestPath.push_back(m_spA);
-
-	int i=0;
-	int index=0;
-
-	for(int q=0;q<memory.m_vecWayPoints.size();q++)
-	{
-
-		for(i=q;i<memory.m_vecWayPoints.size();i++)
-		{
-			fB=memory.m_vecWayPoints[i].absoluteXY;
-
-			int j;
-			for(j=0;j<MAX_BARRIERS;j++)
-			{
-
-				bool log = memory.m_vecBarriers[j].IsIntersect(fA,fB);	
-				if(log)
-				{
-					break;
-				}
-			}
-
-			if(j==MAX_BARRIERS)
-			{
-				fC=fB;
-				q=i;
-			}
-
-		}
-
-		bestPath.push_back(fC);
-		fA=fC;
-
-	}
-
-
-
-
-
-	float fTotalLength=0;
-	vector<SPoint>::const_iterator iter = bestPath.begin();
-
-	SPoint start =*iter;
-	iter++;
-	while(iter!= bestPath.end())
-	{
-		SPoint end = *iter;
-		fTotalLength += start.DistanceToMe(end);
-		start = end;
-		iter++;
-	}
-
-	float fitness = 200/fTotalLength;
-
-	return fitness;
-}
 
 //--------------------- ResetMemory --------------------------
 //
@@ -469,37 +284,78 @@ bool CBobsMap::GetOneValidPath(vector<WayPoint> &path)
 		SPoint spRelative(i*20,RandInt(-100,100));
 		SPoint spPathAbsolute=cord.GetCoordinate(spRelative.x,spRelative.y);
 		while(true)
-		{				
-			int j;
-			for(j=0;j<MAX_BARRIERS;j++)
+		{			
+
+			if(!BarrierIntersection(spPre,spPathAbsolute)&&IsValidPoint(spPathAbsolute))
 			{
-				bool log = m_vecBarriers[j].IsIntersect(spPre,spPathAbsolute);		
-				if(log)
+				break;
+				
+			}else
+			{
+				testCount++;
+				if(testCount>100) 
 				{
-					testCount++;
-					break;
+					return false;
 				}
 			}
-			if(testCount>100) 
-			{
-				return false;
-			}
-			if((j==MAX_BARRIERS)&&IsValidPoint(spPathAbsolute)) break;
-
+			
 			spRelative=SPoint(i*20,RandInt(-100,100));
 			spPathAbsolute=cord.GetCoordinate(spRelative.x,spRelative.y);
-		}
-
-		
+		}	
 		//save waypoint
 		path.push_back(WayPoint(spPathAbsolute,spRelative));
 		spPre=spPathAbsolute;
-		
-
 	}
 
 	
 	return true;
+}
+
+//if line intersect with barriers the return true;
+bool CBobsMap::BarrierIntersection(const SPoint &a,const SPoint &b)
+{
+			
+			for(int j=0;j<MAX_BARRIERS;j++)
+			{
+				bool log = m_vecBarriers[j].IsIntersect(a,b);		
+				if(log)
+				{
+					return true;
+				}
+			}
+		
+			return false;
+
+}
+
+int CBobsMap::CalculateInvalidPointCount(const vector<WayPoint> &waypoints)
+{
+		int count = 0;
+		if(waypoints.size()<1) return -1;
+		vector<WayPoint>::const_iterator iter = waypoints.begin();
+		SPoint spPre =m_spA;
+		iter++;
+		SPoint spNext =iter->absoluteXY;
+
+		while(iter!=waypoints.end())
+		{
+			spNext = iter->absoluteXY;
+			//no intersect with barriers and in the rectange of bounds
+			if(BarrierIntersection(spPre,spNext)||!IsValidPoint(spNext))
+			{
+				count++;
+			}
+			spPre = spNext;
+			iter++;
+		}
+		
+		//check B point
+		spNext = m_spB;
+		if(BarrierIntersection(spPre,spNext)||!IsValidPoint(spNext))
+		{
+			count++;
+		}
+		return count;
 }
 
 
@@ -533,23 +389,13 @@ vector<SPoint> CBobsMap::FixToBestPath(const vector<WayPoint> &waypoints)
 		{
 			fB=vecPath[i].absoluteXY;
 
-			int j;
-			for(j=0;j<MAX_BARRIERS;j++)
-			{
-
-				bool log = m_vecBarriers[j].IsIntersect(fA,fB);	
-				if(log)
-				{
-					break;
-				}
-			}
-
-			if(j==MAX_BARRIERS)
+			bool log = BarrierIntersection(fA,fB);
+			if(!log)
 			{
 				fC=fB;
 				q=i;
 			}
-
+				
 		}
 
 		bestPath.push_back(fC);
@@ -575,4 +421,12 @@ float  CBobsMap::GetPathLength(const vector<SPoint> &path)
 		iter++;
 	}
 	return fTotalLength;
+}
+
+SPoint CBobsMap::TransRelativePointToAbusolutePoint(const SPoint& src)
+{
+		
+		Coordinate cord(m_spA,m_spB);
+		SPoint target =cord.GetCoordinate(src.x,src.y);
+		return target;
 }

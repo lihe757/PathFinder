@@ -90,10 +90,9 @@ bool CBarrier::IsIntersect(const SPoint &a,const SPoint &b)
 
 void CBarrier::Render(HDC surface,const int cxClient,const int cyClient)
 {
-	HBRUSH	BlackBrush, RedBrush, BlueBrush,OldBrush;
-	HPEN	NullPen, OldPen;
+	//HBRUSH	BlackBrush, OldBrush;
 
-	BlackBrush = CreateSolidBrush(RGB(0,0,0));
+	//BlackBrush = CreateSolidBrush(RGB(0,0,0));
 
 	POINT *points=new POINT[vecPoint.size()];
 
@@ -103,17 +102,15 @@ void CBarrier::Render(HDC surface,const int cxClient,const int cyClient)
 		points[i].y=(LONG)vecPoint[i].y;
 
 	}
-	OldBrush = (HBRUSH)SelectObject(surface, BlackBrush);
+	//OldBrush = (HBRUSH)SelectObject(surface, BlackBrush);
 	Polygon(surface,points,vecPoint.size());
 
 	delete[] points;
 
 
 	////restore the original brush
-	SelectObject(surface, OldBrush);
+	//SelectObject(surface, OldBrush);
 
-	////and pen
-	//SelectObject(surface, OldPen);
 }
 
 CBarrier::~CBarrier(void)

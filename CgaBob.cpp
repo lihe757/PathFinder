@@ -46,20 +46,34 @@ void CgaBob::Mutate(vector<int> &vecBits)
 		}
 	}//next bit
 }
+void CgaBob::Mutate2(vector<WayPoint> &vecWayPoint)
+{
+	for (int curBit=0; curBit<vecWayPoint.size(); curBit++)
+	{
+		//do we flip this bit?
+		if (RandFloat() < m_dMutationRate)
+		{
+			//flip the bit
+			vecWayPoint[curBit].relativeXY.y +=RandInt(-100,100)*RandFloat();
+			SPoint rand = vecWayPoint[curBit].relativeXY;
+			vecWayPoint[curBit].absoluteXY=m_BobsMap.TransRelativePointToAbusolutePoint(rand);
+		}
+	}//next bit
+}
 
 //----------------------------Crossover--------------------------------
 //	Takes 2 parent vectors, selects a midpoint and then swaps the ends
 //	of each genome creating 2 new genomes which are stored in baby1 and
 //	baby2.
 //---------------------------------------------------------------------
-void CgaBob::Crossover( const vector<int> &mum,
-						const vector<int> &dad,
-						vector<int>		  &baby1,
-						vector<int>		  &baby2)
+void CgaBob:: Crossover2(const vector<WayPoint>	&mum,
+						 const  vector<WayPoint>	&dad,
+								vector<WayPoint>	&baby1,
+								vector<WayPoint>	&baby2)
 {
 	//just return parents as offspring dependent on the rate
 	//or if parents are the same
-	if ( (RandFloat() > m_dCrossoverRate) || (mum == dad)) 
+	if ( (RandFloat() > m_dCrossoverRate) ) 
 	{
 		baby1 = mum;
 		baby2 = dad;
@@ -110,7 +124,6 @@ void CgaBob::CreateStartPopulation()
 	
 	for (int i=0; i<m_iPopSize; i++)
 	{
-		//m_vecGenomes.push_back(SGenome(m_iChromoLength));
 		
 		//lhx
 		vector<WayPoint> wpoints;
@@ -118,10 +131,8 @@ void CgaBob::CreateStartPopulation()
 		{
 			wpoints.clear();
 		}
-		
 		m_vecGenomes.push_back(SGenome (wpoints));
-
-
+		m_iChromoLength=wpoints.size();
 	}
 
 	//reset all variables
@@ -153,25 +164,25 @@ void CgaBob::Epoch()
 		//select 2 parents
 		SGenome mum = RouletteWheelSelection();
 		SGenome dad = RouletteWheelSelection();
-		m_BobsBrain.m_vecWayPoints = mum.vecWayPoint;
+	
 
 		//operator - crossover
-		//SGenome baby1, baby2;
-		//Crossover(mum.vecBits, dad.vecBits, baby1.vecBits, baby2.vecBits);
+		SGenome baby1, baby2;
+		Crossover2(mum.vecWayPoint, dad.vecWayPoint, baby1.vecWayPoint, baby2.vecWayPoint);
 
 		//operator - mutate
-		//Mutate(baby1.vecBits);
-		//Mutate(baby2.vecBits);
+		Mutate2(baby1.vecWayPoint);
+		Mutate2(baby2.vecWayPoint);
 
 		//add to new population
-		//vecBabyGenomes.push_back(baby1);
-		//vecBabyGenomes.push_back(baby2);
+		vecBabyGenomes.push_back(baby1);
+		vecBabyGenomes.push_back(baby2);
 
 		NewBabies += 2;
 	}
 
 	//copy babies back into starter population
-	//m_vecGenomes = vecBabyGenomes;
+	m_vecGenomes = vecBabyGenomes;
 
 	//increment the generation counter
 	++m_iGeneration;
@@ -190,23 +201,21 @@ void CgaBob::UpdateFitnessScores()
 	m_dBestFitnessScore		= 0;
 	m_dTotalFitnessScore	= 0;
 
+	m_bBusy=true;
 	CBobsMap TempMemory;
 	 
 	//update the fitness scores and keep a check on fittest so far
 	for (int i=0; i<m_iPopSize; ++i)
 	{
-		//decode each genomes chromosome into a vector of directions
-		//vector<int> vecDirections = Decode(m_vecGenomes[i].vecBits);
 		//lhx
 		vector<WayPoint> vecWayPoints=m_vecGenomes[i].vecWayPoint;
 
-		//get it's fitness score
-		//m_vecGenomes[i].dFitness = m_BobsMap.TestRoute(vecDirections, TempMemory);
-		//lhx
-		//m_vecGenomes[i].dFitness = m_BobsMap.TestRoute2(vecWayPoints, TempMemory);
+		//get it's fixed route
 		m_vecGenomes[i].vecFixedPoint =m_BobsMap.FixToBestPath(vecWayPoints);
-			//calculate the tourlength for each chromosome
+		//calculate the tourlength for each chromosome
 		float TourLength = m_BobsMap.GetPathLength(m_vecGenomes[i].vecFixedPoint);
+		// if route has intersection then add punishment
+		TourLength +=50* m_BobsMap.CalculateInvalidPointCount(m_vecGenomes[i].vecWayPoint);
 
 		m_vecGenomes[i].dFitness = TourLength;
 		
@@ -223,28 +232,6 @@ void CgaBob::UpdateFitnessScores()
 		{
 			m_fLongestRoute = TourLength;
 		}
-
-		////update total
-		//m_dTotalFitnessScore += m_vecGenomes[i].dFitness;
-
-		////if this is the fittest genome found so far, store results
-		//if (m_vecGenomes[i].dFitness > m_dBestFitnessScore)
-		//{
-		//	m_dBestFitnessScore = m_vecGenomes[i].dFitness;
-
-		//	m_iFittestGenome = i;
-
-		//	m_BobsBrain = TempMemory;
-
-		//	//Has Bob found the exit?
-		//	if (m_vecGenomes[i].dFitness == 1)
-		//	{
-		//		//is so, stop the run
-		//		m_bBusy = false;
-		//	}
-		//}
-
-		//TempMemory.ResetMemory();
 	
 	}//next genome
 
@@ -253,56 +240,9 @@ void CgaBob::UpdateFitnessScores()
 	//the fitness scores
 	for (int i=0; i<m_iPopSize; ++i)
 	{
-		m_vecGenomes[i].dFitness = 
-		m_fLongestRoute - m_vecGenomes[i].dFitness;
+		m_vecGenomes[i].dFitness = m_fLongestRoute - m_vecGenomes[i].dFitness;
 		m_dTotalFitnessScore +=m_vecGenomes[i].dFitness;
 	}
-}
-
-//---------------------------Decode-------------------------------------
-//
-//	decodes a vector of bits into a vector of directions (ints)
-//
-//	0=North, 1=South, 2=East, 3=West
-//-----------------------------------------------------------------------
-vector<int> CgaBob::Decode(const vector<int> &bits)
-{
-	vector<int>	directions;
-
-	//step through the chromosome a gene at a time
-	for (int gene=0; gene < bits.size(); gene += m_iGeneLength)
-	{
-		//get the gene at this position
-		vector<int> ThisGene;
-		
-		for (int bit = 0; bit < m_iGeneLength; ++bit)
-		{
-			ThisGene.push_back(bits[gene+bit]);
-		}
-
-		//convert to decimal and add to list of directions
-		directions.push_back(BinToInt(ThisGene));
-	}
-
-	return directions;
-}
-
-//-------------------------------BinToInt-------------------------------
-//	converts a vector of bits into an integer
-//----------------------------------------------------------------------
-int	CgaBob::BinToInt(const vector<int> &vec)
-{
-	int val = 0;
-	int multiplier = 1;
-	
-	for (int cBit=vec.size(); cBit>0; cBit--)
-	{
-		val += vec[cBit-1] * multiplier;
-		
-		multiplier *= 2;
-	}
-
-	return val;
 }
 
 
@@ -319,7 +259,19 @@ void CgaBob::Render(int cxClient, int cyClient, HDC surface)
 	m_BobsMap.Render(cxClient, cyClient, surface);
 
 	//render the best route
-	m_BobsBrain.MemoryRender(cxClient, cyClient, surface);
+	if(m_bBusy)
+	{
+		vector<SGenome>::const_iterator siter =m_vecGenomes.begin();
+		while(siter!=m_vecGenomes.end())
+		{	
+		
+			m_BobsBrain.MemoryRender2(cxClient, cyClient, surface,siter->vecWayPoint);
+			m_BobsBrain.MemoryRender3(cxClient, cyClient, surface,	m_BobsMap.FixToBestPath(siter->vecWayPoint));
+			siter++;
+		}
+	}
+
+		
 
 	//Render additional information
 	string s = "Generation: " + itos(m_iGeneration);
@@ -340,5 +292,7 @@ void CgaBob::Render(int cxClient, int cyClient, HDC surface)
 		
 		TextOut(surface, cxClient/2 - (Start.size() * 3), cyClient - 20, Start.c_str(), Start.size());
 	}
+
+	if(m_iGeneration>=30) Stop();
 	
 }

@@ -129,6 +129,9 @@ void GetPointFormLine(SPoint &c,const SPoint &a,const float &k,const float &b,fl
 	}
 
 
+
+
+
 //判定两线段位置关系，并求出交点(如果存在)。
 //有重合：完全重合(6)，1个端点重合且共线(5)，部分重合(4)
 //无重合：两端点相交(3)，交于线上(2)，正交(1)，无交(0)，参数错误(-1)

@@ -36,7 +36,7 @@
 
 #define CROSSOVER_RATE	0.7
 #define MUTATION_RATE	0.001
-#define POP_SIZE		10
+#define POP_SIZE		20
 #define CHROMO_LENGTH	70
 #define GENE_LENGTH		2
 

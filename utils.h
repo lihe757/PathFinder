@@ -219,6 +219,16 @@ struct Coordinate
 
 	}
 };
+////////////////////////////////////////////////////////////////
+//
+//SPoint operator override
+///////////////////////////////////////////////////////////////
+bool Equal(float f1, float f2) ;
+	//判断两点是否相等
+bool operator==(const SPoint &p1, const SPoint &p2);
+	//比较两点坐标大小，先比较x坐标，若相同则比较y坐标
+bool operator> (const SPoint &p1, const SPoint &p2);
+float operator^(const SPoint &p1, const SPoint &p2);
 
 ///////////////////////////////////////////////////////
 //
@@ -235,7 +245,9 @@ struct WayPoint
 		absoluteXY=absXY;
 		relativeXY=reXY;
 	}
+
 };
+
 
 void DrawLine(HDC surface,const SPoint& a,const SPoint &b);
 #endif

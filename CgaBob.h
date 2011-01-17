@@ -28,7 +28,6 @@ using namespace std;
 //--------------------------------------------------------------
 struct SGenome
 {
-	vector<int> vecBits;
 	//lihx
 	vector<WayPoint> vecWayPoint;
 	//fixed path point
@@ -39,14 +38,6 @@ struct SGenome
 
 	SGenome():dFitness(0){}
 	
-	SGenome(const int num_bits):dFitness(0)
-	{
-		//create a random bit string
-		for (int i=0; i<num_bits; ++i)
-		{
-			vecBits.push_back(RandInt(0, 1));
-		}
-	}
 	//lihx
 	SGenome(const vector<WayPoint> &points)
 	{
@@ -103,23 +94,17 @@ private:
 
 	
 	void        Mutate(vector<int> &vecBits);
-	
-	void        Crossover(const vector<int>	&mum,
-                        const vector<int> &dad,
-                        vector<int>       &baby1,
-                        vector<int>       &baby2);
-	
+	void		Mutate2(vector<WayPoint> &vecWayPoint);
+
+	void        Crossover2(const vector<WayPoint>	&mum,
+						 const  vector<WayPoint>	&dad,
+								vector<WayPoint>	&baby1,
+								vector<WayPoint>	&baby2);
 	SGenome&		RouletteWheelSelection();
 	
 	//updates the genomes fitness with the new fitness scores and calculates
   //the highest fitness and the fittest member of the population.
   void			  UpdateFitnessScores();
-
-	//decodes a vector of bits into a vector of directions (ints)
-  vector<int>	Decode(const vector<int> &bits);
-	
-	//converts a vector of bits into decimal. Used by Decode.
-  int				  BinToInt(const vector<int> &v);
 
 	//creates a start population of random bit strings
   void			  CreateStartPopulation();
