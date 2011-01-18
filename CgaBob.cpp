@@ -240,14 +240,9 @@ void CgaBob::Render(int cxClient, int cyClient, HDC surface)
 
 	//render the best route
 	vector<SGenome>::const_iterator siter =m_vecGenomes.begin();
-	while(siter!=m_vecGenomes.end())
-	{	
-		m_BobsBrain.RenderOriginRoute(cxClient, cyClient, surface);
-		m_BobsBrain.RenderShortestRoute(cxClient, cyClient, surface);
-		siter++;
-	}
 
-		
+	m_BobsBrain.RenderOriginRoute(cxClient, cyClient, surface);
+	m_BobsBrain.RenderShortestRoute(cxClient, cyClient, surface);	
 
 	//Render additional information
 	string s = "Generation: " + itos(m_iGeneration);
