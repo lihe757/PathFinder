@@ -136,10 +136,9 @@ void CBobsMap::Render(const int cxClient,
 }
 
 
-void CBobsMap::MemoryRender2(const int cxClient,
+void CBobsMap::RenderOriginRoute(const int cxClient,
 							const int cyClient,
-							HDC surface,
-							const vector<WayPoint> &wayPoint)
+							HDC surface)
 {
 	
 
@@ -148,56 +147,67 @@ void CBobsMap::MemoryRender2(const int cxClient,
 
 	Coordinate cord(m_spA,m_spB);
 
+	vector<vector<WayPoint>>::const_iterator veciter = m_TestRoute.begin();
+
+	
 	//draw orginin path in red pen
 	if(true)
 	{
-		SPoint spPre = m_spA;
-		vector<WayPoint>::const_iterator iter = wayPoint.begin();
-		while(iter != wayPoint.end())
+		while( veciter!=m_TestRoute.end())
 		{
-			
-			SPoint spRelative =iter->relativeXY;
-			spRelative.y=0;
-			SPoint spRoot = cord.GetCoordinate(spRelative.x,spRelative.y);
-			SPoint spPathAbsolute = iter->absoluteXY;
+			SPoint spPre = m_spA;
+			vector<WayPoint>::const_iterator iter = veciter->begin();
+			while(iter != veciter->end())
+			{
 
-			//draw zhu zi
-			//DrawLine(surface,spRoot,spPathAbsolute);
-			//draw line to connect spPre and spPathAbsolute
+				SPoint spRelative =iter->relativeXY;
+				spRelative.y=0;
+				SPoint spRoot = cord.GetCoordinate(spRelative.x,spRelative.y);
+				SPoint spPathAbsolute = iter->absoluteXY;
 
-			DrawLine(surface,spPre,spPathAbsolute);
+				//draw zhu zi
+				//DrawLine(surface,spRoot,spPathAbsolute);
+				//draw line to connect spPre and spPathAbsolute
+
+				DrawLine(surface,spPre,spPathAbsolute);
 
 
-			spPre =spPathAbsolute;
-			iter++;
-		}
+				spPre =spPathAbsolute;
+				iter++;
+			}
 			DrawLine(surface,spPre,m_spB);
+			veciter++;
+
+		}
+
 	}
 			SelectObject(surface, m_OldPen);	
 
 
 }
 
-void CBobsMap::MemoryRender3(const int cxClient,
-							const int cyClient,
-							HDC surface,
-							const vector<SPoint> &bestPath)
+void CBobsMap::RenderShortestRoute(const int cxClient,
+							 const int cyClient,
+							 HDC surface)
 {
-	if(bestPath.size()<2) return ;
-
 	//grab a green pen 
 	m_OldPen = (HPEN)SelectObject(surface, m_GreenPen);
 
-	vector<SPoint>::const_iterator siter = bestPath.begin();
-	SPoint prePoint = *siter;
-	siter++;
-	while(siter!= bestPath.end())
+	vector<vector<SPoint>>::const_iterator veciter = m_BestRoute.begin();
+	while(veciter!= m_BestRoute.end())
 	{
-		DrawLine(surface,prePoint,*siter);
-		prePoint=*siter;
+		if(veciter->size()<2) continue ;
+		vector<SPoint>::const_iterator siter = veciter->begin();
+		SPoint prePoint = *siter;
 		siter++;
+		while(siter!= veciter->end())
+		{
+			DrawLine(surface,prePoint,*siter);
+			prePoint=*siter;
+			siter++;
+		}
+		veciter++;
 	}
-	
 	//restore the original brush
 	SelectObject(surface, m_OldPen);
 }
@@ -264,20 +274,23 @@ bool CBobsMap::IsValidPoint (const SPoint &point)
 
 }
 
-bool CBobsMap::GetOneValidPath(vector<WayPoint> &path)
+bool CBobsMap::GetOneValidPath(vector<int> &vecBits,int chromolen)
 {
 	int testCount=0;
+	int iChromoLength=chromolen;
+	int iCutCount=iChromoLength+1;
 
 	Coordinate cord(m_spA,m_spB);
 	SPoint spPre=m_spA;
-
+	
+	int randomY = 0;
 	//divied space 
 	SVector2D line(m_spA.x-m_spB.x,m_spA.y-m_spB.y);
-	int count = (int) Vec2DLength(line)/20;
-	for(int i=1;i<=count;i++)
-	{
-		SPoint spRoot=cord.GetXProjection(i*20);
-		SPoint spRelative(i*20,RandInt(-150,150));
+	int diffX = (int) Vec2DLength(line)/iCutCount;
+	for(int i=1;i<=iChromoLength;i++)
+	{	
+		randomY = RandInt(-150,150);
+		SPoint spRelative(i*diffX,randomY);
 		SPoint spPathAbsolute=cord.GetCoordinate(spRelative.x,spRelative.y);
 		while(true)
 		{			
@@ -295,11 +308,12 @@ bool CBobsMap::GetOneValidPath(vector<WayPoint> &path)
 				}
 			}
 			
-			spRelative=SPoint(i*20,RandInt(-150,150));
+			randomY = RandInt(-150,150);
+			spRelative=SPoint(i*diffX,randomY);
 			spPathAbsolute=cord.GetCoordinate(spRelative.x,spRelative.y);
 		}	
 		//save waypoint
-		path.push_back(WayPoint(spPathAbsolute,spRelative));
+		vecBits.push_back(randomY);
 		spPre=spPathAbsolute;
 	}
 
@@ -429,4 +443,40 @@ SPoint CBobsMap::TransRelativePointToAbusolutePoint(const SPoint& src)
 		Coordinate cord(m_spA,m_spB);
 		SPoint target =cord.GetCoordinate(src.x,src.y);
 		return target;
+}
+
+vector<WayPoint> CBobsMap::Decode(const vector<int> &ycoodinate)
+{
+	vector<WayPoint> wayPoint;
+	vector<int>::const_iterator iter = ycoodinate.begin();
+	
+	SVector2D line(m_spA.x-m_spB.x,m_spA.y-m_spB.y);
+	int diffX = (int) Vec2DLength(line)/(ycoodinate.size()+1);
+	int index=1;
+	
+	while(iter!=ycoodinate.end())
+	{
+	
+		SPoint relativeXY(index*diffX,*iter);
+		SPoint absoluteXY =TransRelativePointToAbusolutePoint(relativeXY);
+		WayPoint point(absoluteXY,relativeXY);
+		wayPoint.push_back(point);
+		index++;
+		iter++;
+	}
+	return wayPoint;
+}
+
+double CBobsMap::TestRoute(const vector<WayPoint> &vecWayPoints)
+{
+	
+	vector<SPoint> vecFixedPoint = FixToBestPath(vecWayPoints);
+	//add one route
+	m_TestRoute.push_back(vecWayPoints);
+	m_BestRoute.push_back(vecFixedPoint);
+	//calculate the tourlength for each chromosome
+	double fitness = GetPathLength(vecFixedPoint);
+	// if route has intersection then add punishment
+	fitness += 50* CalculateInvalidPointCount(vecWayPoints);
+	return fitness;
 }

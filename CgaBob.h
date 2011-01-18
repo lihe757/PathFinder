@@ -28,20 +28,16 @@ using namespace std;
 //--------------------------------------------------------------
 struct SGenome
 {
+
 	//lihx
-	vector<WayPoint> vecWayPoint;
-	//fixed path point
-	vector<SPoint> vecFixedPoint;
-	
+	vector<int> vecYCoordinates;
 	double		dFitness;
-	
 
 	SGenome():dFitness(0){}
 	
-	//lihx
-	SGenome(const vector<WayPoint> &points)
+	SGenome(const vector<int> &yCoordinates)
 	{
-		vecWayPoint = points;
+		vecYCoordinates = yCoordinates;
 	}
 };
 
@@ -92,12 +88,12 @@ private:
 	bool			m_bBusy;
 	
 
-	void		Mutate2(vector<WayPoint> &vecWayPoint);
+	void		Mutate2(vector<int> &vectYCoordinates);
 
-	void        Crossover2(const vector<WayPoint>	&mum,
-						 const  vector<WayPoint>	&dad,
-								vector<WayPoint>	&baby1,
-								vector<WayPoint>	&baby2);
+	void        Crossover2(const  vector<int>	&mum,
+						 const   vector<int>	&dad,
+								 vector<int>	&baby1,
+								 vector<int>	&baby2);
 	SGenome&		RouletteWheelSelection();
 	
 	//updates the genomes fitness with the new fitness scores and calculates

@@ -67,6 +67,8 @@ public:
 	//lihx  diagonal length
 	float				 m_fDiagonalLength;
 	RECT				 m_recBound;
+	vector<vector<WayPoint>> m_TestRoute;
+	vector<vector<SPoint>>  m_BestRoute;
 
 
 	CBobsMap();
@@ -83,8 +85,8 @@ public:
 
 	//draws whatever path may be stored in the memory
 		
-	void MemoryRender2(const int cxClient, const int cyClient, HDC surface,const vector<WayPoint> &wayPoint);
-	void MemoryRender3(const int cxClient, const int cyClient, HDC surface,const vector<SPoint> &bestPath);
+	void RenderOriginRoute(const int cxClient, const int cyClient, HDC surface);
+	void RenderShortestRoute(const int cxClient, const int cyClient, HDC surface);
 
 	void ResetMemory();
 
@@ -92,13 +94,18 @@ public:
 	bool BarrierIntersection(const SPoint &a,const SPoint &b);
 	
 	//lihx gather one valid path
-	bool GetOneValidPath(vector<WayPoint> &path);
+	bool GetOneValidPath(vector<int> &vecBits,int chromolen);
 	vector<SPoint> FixToBestPath(const vector<WayPoint> &waypoints );
 	//calculate invlid point count
 	int CalculateInvalidPointCount(const vector<WayPoint> &waypoints);
 	float GetPathLength(const vector<SPoint> &path);
-
+	//transLate
 	SPoint TransRelativePointToAbusolutePoint(const SPoint& src);
+	//test Route
+	vector<WayPoint>  Decode(const vector<int> &ycoodinate);
+
+	double TestRoute(const vector<WayPoint> &vecWayPoints);
+
 	
 
 
