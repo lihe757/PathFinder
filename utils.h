@@ -189,6 +189,8 @@ struct Coordinate
 	{
 		SPoint c;
 		c=GetXProjection(x);
+		//if y ==0
+		if( abs(y)<1e-4f) return c;
 		SPoint c2;
 		float tmpk=-1/k;
 		float bb=c.y-tmpk*c.x;

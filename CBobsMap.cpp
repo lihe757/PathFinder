@@ -196,7 +196,6 @@ void CBobsMap::RenderShortestRoute(const int cxClient,
 	vector<vector<SPoint>>::const_iterator veciter = m_BestRoute.begin();
 	while(veciter!= m_BestRoute.end())
 	{
-		if(veciter->size()<2) continue ;
 		vector<SPoint>::const_iterator siter = veciter->begin();
 		SPoint prePoint = *siter;
 		siter++;
@@ -281,6 +280,7 @@ bool CBobsMap::GetOneValidPath(vector<int> &vecBits,int chromolen)
 	int iCutCount=iChromoLength+1;
 
 	Coordinate cord(m_spA,m_spB);
+
 	SPoint spPre=m_spA;
 	
 	int randomY = 0;
@@ -416,6 +416,7 @@ vector<SPoint> CBobsMap::FixToBestPath(const vector<WayPoint> &waypoints)
 		preAbs=fAbs;
 	}
 
+
 	return bestPath;
 }
 
@@ -475,7 +476,15 @@ double CBobsMap::TestRoute(const vector<WayPoint> &vecWayPoints)
 	m_TestRoute.push_back(vecWayPoints);
 	m_BestRoute.push_back(vecFixedPoint);
 	//calculate the tourlength for each chromosome
-	double fitness = GetPathLength(vecFixedPoint);
+	double fitness =0.0;
+	if(vecFixedPoint.size()<=2) 
+	{
+		fitness = 9999.9;
+	}else
+	{
+		fitness = GetPathLength(vecFixedPoint);
+	}
+	
 	// if route has intersection then add punishment
 	fitness += 50* CalculateInvalidPointCount(vecWayPoints);
 	return fitness;

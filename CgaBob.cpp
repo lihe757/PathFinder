@@ -136,6 +136,8 @@ void CgaBob::CreateStartPopulation()
 //----------------------------------------------------------------------
 void CgaBob::Epoch()
 {
+
+	
 	
 	UpdateFitnessScores();
 
@@ -238,9 +240,6 @@ void CgaBob::Render(int cxClient, int cyClient, HDC surface)
 	//render the map
 	m_BobsMap.Render(cxClient, cyClient, surface);
 
-	//render the best route
-	vector<SGenome>::const_iterator siter =m_vecGenomes.begin();
-
 	m_BobsBrain.RenderOriginRoute(cxClient, cyClient, surface);
 	m_BobsBrain.RenderShortestRoute(cxClient, cyClient, surface);	
 
@@ -248,7 +247,6 @@ void CgaBob::Render(int cxClient, int cyClient, HDC surface)
 	string s = "Generation: " + itos(m_iGeneration);
 	TextOut(surface, 5, 0, s.c_str(), s.size());
 	
-
 	if (!m_bBusy)
 	{
 		string Start = "Press Return to start a new run";
@@ -264,6 +262,6 @@ void CgaBob::Render(int cxClient, int cyClient, HDC surface)
 		TextOut(surface, cxClient/2 - (Start.size() * 3), cyClient - 20, Start.c_str(), Start.size());
 	}
 
-	if(m_iGeneration>=30) Stop();
+	if(m_iGeneration>=60) Stop();
 	
 }
