@@ -116,6 +116,7 @@ void GetPointFormLine(SPoint &c,const SPoint &a,const float &k,const float &b,fl
 	{
 		return (Equal(p1.x, p2.x) && Equal(p1.y, p2.y));
 	}
+
 	//比较两点坐标大小，先比较x坐标，若相同则比较y坐标
 	bool operator> (const SPoint &p1, const SPoint &p2) 
 	{
@@ -250,6 +251,6 @@ int Intersection(SPoint p1, SPoint p2, SPoint p3, SPoint p4, SPoint &Int) {
 
 void DrawLine(HDC surface,const SPoint& a,const SPoint &b)
 {
-		MoveToEx(surface,a.x,a.y,NULL);
-		LineTo(surface,b.x,b.y);
+		MoveToEx(surface,(LONG)a.x,(LONG)a.y,NULL);
+		LineTo(surface,(LONG)b.x,(LONG)b.y);
 }

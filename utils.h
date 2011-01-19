@@ -204,7 +204,7 @@ struct Coordinate
 		Line lineX(xStart,xEnd);
 		
 		float dist = lineX.DistanceToMe(p);
-		c.y=(int)dist;
+		c.y=dist;
 		SVector2D vect(xStart.x-p.x,xStart.y-p.y);
 		float d = (float)Vec2DLength(vect);
 		float dx = (float)sqrt(d*d-dist*dist);
@@ -214,7 +214,7 @@ struct Coordinate
 
 		Location location = lineY.At(p);
 		if(location == RIGHT) dx*=-1;
-		c.x=(int)dx;
+		c.x=dx;
 
 		return c;
 

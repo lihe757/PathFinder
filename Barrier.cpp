@@ -96,7 +96,8 @@ void CBarrier::Render(HDC surface,const int cxClient,const int cyClient)
 
 	POINT *points=new POINT[vecPoint.size()];
 
-	for(int i=0;i<vecPoint.size();i++)
+	int iPointSize=vecPoint.size();
+	for(int i=0;i<iPointSize;i++)
 	{
 		points[i].x=(LONG)vecPoint[i].x;
 		points[i].y=(LONG)vecPoint[i].y;

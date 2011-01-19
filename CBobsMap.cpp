@@ -400,7 +400,7 @@ vector<SPoint> CBobsMap::FixToBestPath(const vector<WayPoint> &waypoints)
 		{
 			fCRel=vecPath[i].relativeXY;
 			
-			if(abs(fBRel.y)>abs(fCRel.y))
+			if(abs(fBRel.y)>abs(fCRel.y)||Equal(fBRel.y,fCRel.y))
 			{
 				bool log = BarrierIntersection(preAbs,vecPath[i].absoluteXY);
 				if(!log)

@@ -36,7 +36,8 @@ SGenome& CgaBob::RouletteWheelSelection()
 //--------------------------------------------------------------------
 void CgaBob::Mutate2(vector<int> &vectYCoordinates)
 {
-	for (int curBit=0; curBit<vectYCoordinates.size(); curBit++)
+	int iGenLen=vectYCoordinates.size();
+	for (int curBit=0; curBit<iGenLen; curBit++)
 	{
 		//do we flip this bit?
 		if (RandFloat() < m_dMutationRate)
@@ -240,7 +241,7 @@ void CgaBob::Render(int cxClient, int cyClient, HDC surface)
 	//render the map
 	m_BobsMap.Render(cxClient, cyClient, surface);
 
-	m_BobsBrain.RenderOriginRoute(cxClient, cyClient, surface);
+	//m_BobsBrain.RenderOriginRoute(cxClient, cyClient, surface);
 	m_BobsBrain.RenderShortestRoute(cxClient, cyClient, surface);	
 
 	//Render additional information
@@ -262,6 +263,6 @@ void CgaBob::Render(int cxClient, int cyClient, HDC surface)
 		TextOut(surface, cxClient/2 - (Start.size() * 3), cyClient - 20, Start.c_str(), Start.size());
 	}
 
-	if(m_iGeneration>=60) Stop();
+	if(m_iGeneration>=30) Stop();
 	
 }
