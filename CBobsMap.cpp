@@ -21,10 +21,10 @@ const SPoint CBobsMap::m_spB(END_X,END_Y);
 
 const SPoint CBobsMap::m_sp1[BARRIER_COUNT1]=
 {
-	SPoint(290.76, 58),
-	SPoint(267.74 ,89),
-	SPoint(295.4 ,109),
-	SPoint(318.42 ,79),
+	SPoint(290, 58),
+	SPoint(267 ,89),
+	SPoint(295 ,109),
+	SPoint(318 ,79),
 	
 };
 const SPoint CBobsMap::m_sp2[BARRIER_COUNT2]=
@@ -186,7 +186,7 @@ void CBobsMap::RenderOriginRoute(const int cxClient,
 
 }
 
-void CBobsMap::RenderShortestRoute(const int cxClient,
+void CBobsMap::RenderShortRoute(const int cxClient,
 							 const int cyClient,
 							 HDC surface)
 {
@@ -208,6 +208,27 @@ void CBobsMap::RenderShortestRoute(const int cxClient,
 		veciter++;
 	}
 	//restore the original brush
+	SelectObject(surface, m_OldPen);
+}
+
+void CBobsMap::RenderBestRoute(const int cxClient, const int cyClient, HDC surface,vector<WayPoint> bestRoute)
+{
+		//grab a green pen 
+	m_OldPen = (HPEN)SelectObject(surface, m_BluePen);
+
+	vector<SPoint> fixed = FixToBestPath(bestRoute);
+	SPoint prePoint = m_spA;
+	vector<SPoint>::const_iterator iter = fixed.begin();
+	while(iter!=fixed.end())
+	{
+		SPoint nextPoint = *iter;
+		DrawLine(surface,prePoint,nextPoint);
+		prePoint=nextPoint;
+		iter++;
+	}
+
+
+		//restore the original brush
 	SelectObject(surface, m_OldPen);
 }
 
@@ -246,6 +267,7 @@ CBobsMap::CBobsMap()
 		//lhx grab pens
 		m_GreenPen = CreatePen(PS_SOLID, 1, RGB(0,255, 0));
 		m_RedPen = CreatePen(PS_SOLID, 1, RGB(255, 0, 0));
+		m_BluePen = CreatePen(PS_SOLID, 2, RGB(0, 0, 255));
 
 }
 
@@ -338,18 +360,18 @@ bool CBobsMap::BarrierIntersection(const SPoint &a,const SPoint &b)
 
 }
 
-int CBobsMap::CalculateInvalidPointCount(const vector<WayPoint> &waypoints)
+int CBobsMap::CalculateInvalidPointCount(const vector<SPoint> &waypoints)
 {
 		int count = 0;
 		if(waypoints.size()<1) return -1;
-		vector<WayPoint>::const_iterator iter = waypoints.begin();
+		vector<SPoint>::const_iterator iter = waypoints.begin();
 		SPoint spPre =m_spA;
 		iter++;
-		SPoint spNext =iter->absoluteXY;
+		SPoint spNext =*iter;
 
 		while(iter!=waypoints.end())
 		{
-			spNext = iter->absoluteXY;
+			spNext = *iter;
 			//no intersect with barriers and in the rectange of bounds
 			if(BarrierIntersection(spPre,spNext)||!IsValidPoint(spNext))
 			{
@@ -366,6 +388,38 @@ int CBobsMap::CalculateInvalidPointCount(const vector<WayPoint> &waypoints)
 			count++;
 		}
 		return count;
+}
+
+int CBobsMap::CalculateInvalidPointCount(const vector<WayPoint> &waypoints)
+{
+
+		int count = 0;
+		if(waypoints.size()<1) return -1;
+		vector<WayPoint>::const_iterator iter = waypoints.begin();
+		SPoint spPre =m_spA;
+		iter++;
+		SPoint spNext =iter->absoluteXY;
+
+		while(iter!=waypoints.end())
+		{
+			spNext =iter->absoluteXY;
+			//no intersect with barriers and in the rectange of bounds
+			if(BarrierIntersection(spPre,spNext)||!IsValidPoint(spNext))
+			{
+				count++;
+			}
+			spPre = spNext;
+			iter++;
+		}
+		
+		//check B point
+		spNext = m_spB;
+		if(BarrierIntersection(spPre,spNext)||!IsValidPoint(spNext))
+		{
+			count++;
+		}
+		return count;
+
 }
 
 
@@ -391,8 +445,8 @@ vector<SPoint> CBobsMap::FixToBestPath(const vector<WayPoint> &waypoints)
 
 	int i=0;
 	int index=0;
-
-	for(int q=0;q<vecPath.size();q++)
+	int vecPathSize = vecPath.size();
+	for(int q=0;q<vecPathSize;q++)
 	{
 		fBRel=vecPath[q].relativeXY;
 		fAbs =vecPath[q].absoluteXY;
@@ -481,6 +535,7 @@ double CBobsMap::TestRoute(const vector<WayPoint> &vecWayPoints)
 	fitness = GetPathLength(vecFixedPoint);
 	
 	// if route has intersection then add punishment
-	fitness += 50* CalculateInvalidPointCount(vecWayPoints);
+	//fitness += 50* CalculateInvalidPointCount(vecWayPoints);
+	fitness += 50* CalculateInvalidPointCount(vecFixedPoint);
 	return fitness;
 }

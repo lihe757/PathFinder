@@ -57,6 +57,7 @@ private:
 	 HPEN				 m_OldPen ;
 	 HPEN				 m_GreenPen;
 	 HPEN				 m_RedPen;
+	 HPEN				 m_BluePen;
 
 
 public:
@@ -86,7 +87,8 @@ public:
 	//draws whatever path may be stored in the memory
 		
 	void RenderOriginRoute(const int cxClient, const int cyClient, HDC surface);
-	void RenderShortestRoute(const int cxClient, const int cyClient, HDC surface);
+	void RenderShortRoute(const int cxClient, const int cyClient, HDC surface);
+	void RenderBestRoute(const int cxClient, const int cyClient, HDC surface,vector<WayPoint> bestRoute);
 
 	void ResetMemory();
 
@@ -97,6 +99,7 @@ public:
 	bool GetOneValidPath(vector<int> &vecBits,int chromolen);
 	vector<SPoint> FixToBestPath(const vector<WayPoint> &waypoints );
 	//calculate invlid point count
+	int CalculateInvalidPointCount(const vector<SPoint> &waypoints);
 	int CalculateInvalidPointCount(const vector<WayPoint> &waypoints);
 	float GetPathLength(const vector<SPoint> &path);
 	//transLate

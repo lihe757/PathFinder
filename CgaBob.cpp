@@ -242,7 +242,7 @@ void CgaBob::Render(int cxClient, int cyClient, HDC surface)
 	m_BobsMap.Render(cxClient, cyClient, surface);
 
 	//m_BobsBrain.RenderOriginRoute(cxClient, cyClient, surface);
-	m_BobsBrain.RenderShortestRoute(cxClient, cyClient, surface);	
+	m_BobsBrain.RenderShortRoute(cxClient, cyClient, surface);	
 
 	//Render additional information
 	string s = "Generation: " + itos(m_iGeneration);
@@ -263,6 +263,11 @@ void CgaBob::Render(int cxClient, int cyClient, HDC surface)
 		TextOut(surface, cxClient/2 - (Start.size() * 3), cyClient - 20, Start.c_str(), Start.size());
 	}
 
-	if(m_iGeneration>=30) Stop();
+	if(m_iGeneration>=GENERATIONS)
+	{ 
+		Stop();
+		vector<WayPoint> bestPath = m_BobsBrain.Decode(m_vecGenomes[m_iFittestGenome].vecYCoordinates);
+		m_BobsBrain.RenderBestRoute(cxClient, cyClient, surface,bestPath);
+	}
 	
 }

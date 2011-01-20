@@ -39,5 +39,5 @@
 #define POP_SIZE		20
 #define CHROMO_LENGTH	20
 #define GENE_LENGTH		1
-
+#define GENERATIONS		30
 #endif
