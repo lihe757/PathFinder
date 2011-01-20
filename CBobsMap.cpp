@@ -392,7 +392,7 @@ vector<SPoint> CBobsMap::FixToBestPath(const vector<WayPoint> &waypoints)
 	int i=0;
 	int index=0;
 
-	for(int q=0;q<vecPath.size()-1;q++)
+	for(int q=0;q<vecPath.size();q++)
 	{
 		fBRel=vecPath[q].relativeXY;
 		fAbs =vecPath[q].absoluteXY;
@@ -409,7 +409,8 @@ vector<SPoint> CBobsMap::FixToBestPath(const vector<WayPoint> &waypoints)
 					fAbs =vecPath[i].absoluteXY;
 					q=i;
 				}
-			}	
+			}
+
 		}
 
 		bestPath.push_back(fAbs);
@@ -477,13 +478,7 @@ double CBobsMap::TestRoute(const vector<WayPoint> &vecWayPoints)
 	m_BestRoute.push_back(vecFixedPoint);
 	//calculate the tourlength for each chromosome
 	double fitness =0.0;
-	if(vecFixedPoint.size()<=2) 
-	{
-		fitness = 9999.9;
-	}else
-	{
-		fitness = GetPathLength(vecFixedPoint);
-	}
+	fitness = GetPathLength(vecFixedPoint);
 	
 	// if route has intersection then add punishment
 	fitness += 50* CalculateInvalidPointCount(vecWayPoints);
