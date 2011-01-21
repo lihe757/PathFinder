@@ -11,8 +11,8 @@
 //
 /////////////////////////////////////////////////////////////////////////
 
-#define WINDOW_WIDTH	450
-#define WINDOW_HEIGHT	350
+#define WINDOW_WIDTH	500
+#define WINDOW_HEIGHT	400
 
 #define MAP_WIDTH		15
 #define MAP_HEIGHT		10
@@ -34,10 +34,11 @@
 #define END_X			368
 #define END_Y			249
 
-#define CROSSOVER_RATE	0.7
-#define MUTATION_RATE	0.001
+#define CROSSOVER_RATE	0.7f
+#define MUTATION_RATE	0.001f
 #define POP_SIZE		20
 #define CHROMO_LENGTH	20
-#define GENE_LENGTH		1
 #define GENERATIONS		30
+
+#define UM_SPAWN_NEW (WM_USER + 0)
 #endif

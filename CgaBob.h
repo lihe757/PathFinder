@@ -86,6 +86,8 @@ private:
 
 	//lets you know if the current run is in progress.
 	bool			m_bBusy;
+	bool			m_bShowOrigin;
+	bool			m_bShowFixed;
 	
 
 	void		Mutate2(vector<int> &vectYCoordinates);
@@ -108,17 +110,19 @@ public:
 	CgaBob(double cross_rat,
          double mut_rat,
          int    pop_size,
-         int    num_bits,
-         int    gene_len):m_dCrossoverRate(cross_rat),
+         int    num_bits
+			):m_dCrossoverRate(cross_rat),
                           m_dMutationRate(mut_rat),
                           m_iPopSize(pop_size),
                           m_iChromoLength(num_bits),
                           m_dTotalFitnessScore(0.0),
                           m_iGeneration(0),
-                          m_iGeneLength(gene_len),
-						  m_fLongestRoute(0),
+                    	  m_fLongestRoute(0),
 						  m_fShortestRoute(9999.0),
-                          m_bBusy(false)
+                          m_bBusy(false),
+						  m_bShowOrigin(false),
+						  m_bShowFixed(true)
+
 		
 	{
 		CreateStartPopulation();
@@ -135,6 +139,8 @@ public:
 	int				GetFittest(){return m_iFittestGenome;}
   bool      Started(){return m_bBusy;}
   void			Stop(){m_bBusy = false;}
+
+  void		SetShowOption(bool showOrigin,bool showFixed);
 };
 
 

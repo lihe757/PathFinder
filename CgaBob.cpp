@@ -241,8 +241,15 @@ void CgaBob::Render(int cxClient, int cyClient, HDC surface)
 	//render the map
 	m_BobsMap.Render(cxClient, cyClient, surface);
 
-	//m_BobsBrain.RenderOriginRoute(cxClient, cyClient, surface);
-	m_BobsBrain.RenderShortRoute(cxClient, cyClient, surface);	
+	if(m_bShowOrigin)
+	{
+		m_BobsBrain.RenderOriginRoute(cxClient, cyClient, surface);
+	}
+	if(m_bShowFixed)
+	{
+		m_BobsBrain.RenderShortRoute(cxClient, cyClient, surface);
+	}
+	
 
 	//Render additional information
 	string s = "Generation: " + itos(m_iGeneration);
@@ -271,3 +278,10 @@ void CgaBob::Render(int cxClient, int cyClient, HDC surface)
 	}
 	
 }
+
+ void	CgaBob::SetShowOption(bool showOrigin,bool showFixed)
+ {
+	 m_bShowOrigin = showOrigin;
+	 m_bShowFixed=showFixed;
+
+ }
