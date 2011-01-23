@@ -14,8 +14,6 @@
 #define WINDOW_WIDTH	500
 #define WINDOW_HEIGHT	400
 
-#define MAP_WIDTH		15
-#define MAP_HEIGHT		10
 //lhx
 #define MAP_BORDER		20
 

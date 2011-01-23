@@ -8,15 +8,13 @@
 #include "defines.h"
 #include "resource.h"
 
-
-
 using namespace std;
 
 
 
 ///////////////////////GLOBALS ////////////////////////////////////
 
-char*			szApplicationName = "Chapter3 - Pathfinder";
+char*			szApplicationName = "Pathfinder";
 char*			szWindowClassName = "PFclass";
 
 float g_fCrossoverRate =(float) CROSSOVER_RATE;
@@ -296,11 +294,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd,
 				
 				}
 				break;
-			case ID_SETTING_EXIT:
-				{
-
-				}
-				break;
+			
 			}
 		}
 		break;

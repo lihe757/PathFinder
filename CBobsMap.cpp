@@ -1,23 +1,14 @@
 #include "CBobsMap.h"
 
+const int CBobsMap::m_iStartX = START_X;
+const int CBobsMap::m_iStartY = START_Y;
 
-//this defines our little maze which Bob wanders
-//around in
-const int CBobsMap::map[MAP_HEIGHT][MAP_WIDTH] = 
-{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
- 1, 0, 1, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 1,
- 8, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 1,
- 1, 0, 0, 0, 1, 1, 1, 0, 0, 1, 0, 0, 0, 0, 1,
- 1, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 1, 0, 1,
- 1, 1, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 1, 0, 1,
- 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 1, 1, 0, 1,
- 1, 0, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 5,
- 1, 0, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1,
- 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
+const int CBobsMap::m_iEndX =END_X;
+const int CBobsMap::m_iEndY = END_Y;
 
 //lhx dirct path
-const SPoint CBobsMap::m_spA(START_X,START_Y);
-const SPoint CBobsMap::m_spB(END_X,END_Y);
+const SPoint CBobsMap::m_spA(m_iStartX,m_iStartY);
+const SPoint CBobsMap::m_spB(m_iEndX,m_iEndY);
 
 const SPoint CBobsMap::m_sp1[BARRIER_COUNT1]=
 {
@@ -76,14 +67,7 @@ const int CBobsMap::m_aBarriesCount[MAX_BARRIERS]=
 	 BARRIER_COUNT6
 };
 
-const int CBobsMap::m_iMapHeight = MAP_HEIGHT;
-const int CBobsMap::m_iMapWidth  = MAP_WIDTH;
 
-const int CBobsMap::m_iStartX = 14;
-const int CBobsMap::m_iStartY = 7;
-
-const int CBobsMap::m_iEndX = 0;
-const int CBobsMap::m_iEndY = 2;
 
 
 //-------------------------------Render -----------------------------
@@ -93,9 +77,6 @@ void CBobsMap::Render(const int cxClient,
 					  HDC surface)
 {
 	const int border = MAP_BORDER;
-
-	int BlockSizeX = (cxClient - 2*border)/m_iMapWidth;
-	int BlockSizeY = (cyClient - 2*border)/m_iMapHeight;
 
 	RECT rectan ={border,border,cxClient-border, cyClient-border};
 	m_recBound.left=rectan.left;
@@ -140,7 +121,6 @@ void CBobsMap::RenderOriginRoute(const int cxClient,
 							const int cyClient,
 							HDC surface)
 {
-	
 
 	//grab a red pen 
 	m_OldPen = (HPEN)SelectObject(surface,m_RedPen);
@@ -164,10 +144,6 @@ void CBobsMap::RenderOriginRoute(const int cxClient,
 				spRelative.y=0;
 				SPoint spRoot = cord.GetCoordinate(spRelative.x,spRelative.y);
 				SPoint spPathAbsolute = iter->absoluteXY;
-
-				//draw zhu zi
-				//DrawLine(surface,spRoot,spPathAbsolute);
-				//draw line to connect spPre and spPathAbsolute
 
 				DrawLine(surface,spPre,spPathAbsolute);
 
@@ -233,24 +209,9 @@ void CBobsMap::RenderBestRoute(const int cxClient, const int cyClient, HDC surfa
 }
 
 
-//--------------------- ResetMemory --------------------------
-//
-//	resets the memory map to zeros
-//------------------------------------------------------------
-void CBobsMap::ResetMemory()
-{
-	for (int y=0; y<m_iMapHeight; ++y)
-	{
-		for (int x=0; x<m_iMapWidth; ++x)
-		{
-			memory[y][x] = 0;
-		}
-	}
-}
 
 CBobsMap::CBobsMap()
 {
-	ResetMemory();
 
 		//lhx	add Barriers
 		m_vecBarriers.push_back(CBarrier(m_sp1,m_aBarriesCount[0]));
@@ -535,7 +496,6 @@ double CBobsMap::TestRoute(const vector<WayPoint> &vecWayPoints)
 	fitness = GetPathLength(vecFixedPoint);
 	
 	// if route has intersection then add punishment
-	//fitness += 50* CalculateInvalidPointCount(vecWayPoints);
 	fitness += 50* CalculateInvalidPointCount(vecFixedPoint);
 	return fitness;
 }

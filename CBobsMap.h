@@ -27,8 +27,6 @@ class CBobsMap
 {
 private:
 	
-	//storage for the map
-	static const int	map[MAP_HEIGHT][MAP_WIDTH];
 	//lihx barries points 
 	static const int	m_aBarriesCount[MAX_BARRIERS];
 	static const SPoint	m_sp1[BARRIER_COUNT1];
@@ -41,9 +39,6 @@ private:
 	vector<CBarrier>	m_vecBarriers;
 	static const SPoint m_spA;
 	static const SPoint	m_spB;
-
-	static const int	m_iMapWidth;
-	static const int	m_iMapHeight;
 
 	//index into the array which is the start point
 	static const int	m_iStartX;
@@ -62,8 +57,6 @@ private:
 
 public:
 
-	//we can use this array as Bobs memory if rqd
-	int					memory[MAP_HEIGHT][MAP_WIDTH];
 	
 	//lihx  diagonal length
 	float				 m_fDiagonalLength;
@@ -73,12 +66,6 @@ public:
 
 
 	CBobsMap();
-	
-	//takes a string of directions and see's how far Bob
-	//can get. Returns a fitness score proportional to the 
-	//distance reached from the exit.
-
-	//double TestRoute(const vector<int> &vecPath, CBobsMap &memory);
 
 	//given a surface to draw on this function uses the windows GDI
 	//to display the map.
@@ -90,7 +77,6 @@ public:
 	void RenderShortRoute(const int cxClient, const int cyClient, HDC surface);
 	void RenderBestRoute(const int cxClient, const int cyClient, HDC surface,vector<WayPoint> bestRoute);
 
-	void ResetMemory();
 
 	bool IsValidPoint (const SPoint &point);
 	bool BarrierIntersection(const SPoint &a,const SPoint &b);
