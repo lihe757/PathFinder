@@ -270,7 +270,7 @@ void CgaBob::Render(int cxClient, int cyClient, HDC surface)
 		TextOut(surface, cxClient/2 - (Start.size() * 3), cyClient - 20, Start.c_str(), Start.size());
 	}
 
-	if(m_iGeneration>=GENERATIONS)
+	if(m_iGeneration>=m_iMaxGeneration)
 	{ 
 		Stop();
 		vector<WayPoint> bestPath = m_BobsBrain.Decode(m_vecGenomes[m_iFittestGenome].vecYCoordinates);

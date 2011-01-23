@@ -75,6 +75,7 @@ private:
 	float			m_fShortestRoute;
 	
 	int             m_iGeneration;
+	int				m_iMaxGeneration;
 
 	//create an instance of the map class
 	CBobsMap        m_BobsMap;
@@ -110,7 +111,8 @@ public:
 	CgaBob(double cross_rat,
          double mut_rat,
          int    pop_size,
-         int    num_bits
+         int    num_bits,
+		 int	max_generation
 			):m_dCrossoverRate(cross_rat),
                           m_dMutationRate(mut_rat),
                           m_iPopSize(pop_size),
@@ -121,7 +123,8 @@ public:
 						  m_fShortestRoute(9999.0),
                           m_bBusy(false),
 						  m_bShowOrigin(false),
-						  m_bShowFixed(true)
+						  m_bShowFixed(true),
+						  m_iMaxGeneration(max_generation)
 
 		
 	{

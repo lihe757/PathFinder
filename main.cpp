@@ -176,7 +176,8 @@ LRESULT CALLBACK WindowProc(HWND hwnd,
 			g_pGABob = new CgaBob(g_fCrossoverRate ,
 								            g_fMutateRate ,
 							            	g_iPopSize ,
-								            g_iChromoLength
+								            g_iChromoLength,
+											g_iMaxGeneration
 								            );
 			
 			//get the size of the client window
@@ -211,7 +212,8 @@ LRESULT CALLBACK WindowProc(HWND hwnd,
 			g_pGABob = new CgaBob(g_fCrossoverRate ,
 								            g_fMutateRate ,
 							            	g_iPopSize ,
-								            g_iChromoLength
+								            g_iChromoLength,
+											g_iMaxGeneration
 								            );
 			bool bOrigin=false;
 			bool bFixed=true;
