@@ -501,7 +501,7 @@ double CBobsMap::TestRoute(const vector<WayPoint> &vecWayPoints)
 	fitness = GetPathLength(vecFixedPoint);
 	
 	// if route has intersection then add punishment
-	//fitness += 50* CalculateInvalidPointCount(vecFixedPoint);
-	fitness += 50* CalculateInvalidPointCount(vecWayPoints);
+	fitness += 50* CalculateInvalidPointCount(vecFixedPoint);
+	//fitness += 50* CalculateInvalidPointCount(vecWayPoints);
 	return fitness;
 }
