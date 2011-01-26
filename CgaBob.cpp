@@ -148,10 +148,10 @@ void CgaBob::Epoch()
 	//create some storage for the baby genomes 
 	vector<SGenome> vecBabyGenomes;
 	
-	for(int i=0;i<2;i++)
-	{
-		vecBabyGenomes.push_back(m_vecGenomes[m_iFittestGenome]);
-	}
+	//for(int i=0;i<2;i++)
+	//{
+	//	vecBabyGenomes.push_back(m_vecGenomes[m_iFittestGenome]);
+	//}
 
 	while (NewBabies < m_iPopSize)
 	{
@@ -278,8 +278,25 @@ void CgaBob::Render(int cxClient, int cyClient, HDC surface)
 	if(m_iGeneration>=m_iMaxGeneration)
 	{ 
 		Stop();
-		vector<WayPoint> bestPath = m_BobsBrain.Decode(m_vecGenomes[m_iFittestGenome].vecYCoordinates);
-		m_BobsBrain.RenderBestRoute(cxClient, cyClient, surface,bestPath);
+		RestGA();
+		//add a best route genome
+		m_vecBestGenomes.push_back(m_vecGenomes[m_iFittestGenome]);
+		if(m_vecBestGenomes.size()>=10)
+		{
+			vector<SGenome>::const_iterator iter = m_vecBestGenomes.begin();
+			while(iter!=m_vecBestGenomes.end())
+			{
+				vector<WayPoint> bestPath = m_BobsBrain.Decode(iter->vecYCoordinates);
+				m_BobsBrain.RenderBestRoute(cxClient, cyClient, surface,bestPath);
+				iter++;
+			}
+		}else
+		{
+			vector<WayPoint> bestPath = m_BobsBrain.Decode(m_vecGenomes[m_iFittestGenome].vecYCoordinates);
+			m_BobsBrain.RenderBestRoute(cxClient, cyClient, surface,bestPath);
+		}
+
+
 	}
 	
 }
@@ -289,4 +306,12 @@ void CgaBob::Render(int cxClient, int cyClient, HDC surface)
 	 m_bShowOrigin = showOrigin;
 	 m_bShowFixed=showFixed;
 
+ }
+ //Rest ALL GA to do new Run
+ void	CgaBob::RestGA()
+ {
+						  m_dTotalFitnessScore=0;
+                          m_iGeneration=0;
+                    	  m_fLongestRoute=0;
+						  m_fShortestRoute=9999.0;
  }

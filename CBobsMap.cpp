@@ -233,7 +233,7 @@ CBobsMap::CBobsMap()
 		//lhx grab pens
 		m_GreenPen = CreatePen(PS_SOLID, 1, RGB(0,255, 0));
 		m_RedPen = CreatePen(PS_SOLID, 1, RGB(255, 0, 0));
-		m_BluePen = CreatePen(PS_SOLID, 2, RGB(0, 0, 255));
+		m_BluePen = CreatePen(PS_SOLID, 1, RGB(0, 0, 255));
 
 }
 
@@ -501,6 +501,7 @@ double CBobsMap::TestRoute(const vector<WayPoint> &vecWayPoints)
 	fitness = GetPathLength(vecFixedPoint);
 	
 	// if route has intersection then add punishment
-	fitness += 50* CalculateInvalidPointCount(vecFixedPoint);
+	//fitness += 50* CalculateInvalidPointCount(vecFixedPoint);
+	fitness += 50* CalculateInvalidPointCount(vecWayPoints);
 	return fitness;
 }

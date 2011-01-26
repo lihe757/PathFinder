@@ -51,6 +51,7 @@ private:
 
 	//the population of genomes
 	vector<SGenome>	m_vecGenomes;
+	vector<SGenome> m_vecBestGenomes;
 	
 	//size of population
 	int             m_iPopSize;
@@ -135,15 +136,16 @@ public:
 
 	void			Render(int cxClient, int cyClient, HDC surface);
 
-  void			Epoch();
-	
+	void			Epoch();
+
 	//accessor methods
 	int				Generation(){return m_iGeneration;}
 	int				GetFittest(){return m_iFittestGenome;}
-  bool      Started(){return m_bBusy;}
-  void			Stop(){m_bBusy = false;}
+	bool			Started(){return m_bBusy;}
+	void			Stop(){m_bBusy = false;}
 
-  void		SetShowOption(bool showOrigin,bool showFixed);
+	void		SetShowOption(bool showOrigin,bool showFixed);
+	void		RestGA();
 };
 
 
