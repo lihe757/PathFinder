@@ -350,6 +350,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd,
 }//end WinProc
 
 
+
 //-----------------------------------WinMain-----------------------------------------
 //	Entry point for our windows application
 //-----------------------------------------------------------------------------------
@@ -423,7 +424,7 @@ int WINAPI WinMain(	HINSTANCE hinstance,
     //if the user has started the run update the GA and display
     //accordingly
     if (g_pGABob->Started())
-    {
+    {	
 	    //update the gun
       g_pGABob->Epoch();
 

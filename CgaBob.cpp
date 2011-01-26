@@ -1,6 +1,14 @@
 #include "CgaBob.h"
-
-
+long startTime=0;
+long endTime=0;
+long   GetMillisecondsCount()   
+{   
+	long   lMillisecondsCount;   
+	SYSTEMTIME   sysTime;   
+	::GetSystemTime(&sysTime);   
+	lMillisecondsCount   =   sysTime.wMilliseconds   +   sysTime.wSecond   *   1000   +   sysTime.wMinute   *   1000   *   60   +   sysTime.wHour   *   1000   *   60   *   60;   
+	return   lMillisecondsCount;   
+}
 
 //--------------------------RouletteWheelSelection-----------------
 //
@@ -94,6 +102,7 @@ void CgaBob:: Crossover2(const vector<int>	&mum,
 //------------------------------------------------------------------------
 void CgaBob::Run(HWND hwnd)
 {
+	startTime=GetMillisecondsCount();
 	//The first thing we have to do is create a random population
 	//of genomes
 	CreateStartPopulation();
@@ -243,41 +252,46 @@ void CgaBob::UpdateFitnessScores()
 //----------------------------------------------------------------
 void CgaBob::Render(int cxClient, int cyClient, HDC surface)
 {
-	//render the map
-	m_BobsMap.Render(cxClient, cyClient, surface);
+	////render the map
+	//m_BobsMap.Render(cxClient, cyClient, surface);
 
-	if(m_bShowOrigin)
-	{
-		m_BobsBrain.RenderOriginRoute(cxClient, cyClient, surface);
-	}
-	if(m_bShowFixed)
-	{
-		m_BobsBrain.RenderShortRoute(cxClient, cyClient, surface);
-	}
-	
+	//if(m_bShowOrigin)
+	//{
+	//	m_BobsBrain.RenderOriginRoute(cxClient, cyClient, surface);
+	//}
+	//if(m_bShowFixed)
+	//{
+	//	m_BobsBrain.RenderShortRoute(cxClient, cyClient, surface);
+	//}
+	//
 
-	//Render additional information
-	string s = "Generation: " + itos(m_iGeneration);
-	TextOut(surface, 5, 0, s.c_str(), s.size());
-	
-	if (!m_bBusy)
-	{
-		string Start = "Press Return to start a new run";
-		
-		TextOut(surface, cxClient/2 - (Start.size() * 3), cyClient - 20, Start.c_str(), Start.size());
-	}
-	
-	else
-		
-	{
-		string Start = "Space to stop";
-		
-		TextOut(surface, cxClient/2 - (Start.size() * 3), cyClient - 20, Start.c_str(), Start.size());
-	}
+	////Render additional information
+	//string s = "Generation: " + itos(m_iGeneration);
+	//TextOut(surface, 5, 0, s.c_str(), s.size());
+	//
+	//if (!m_bBusy)
+	//{
+	//	string Start = "Press Return to start a new run";
+	//	
+	//	TextOut(surface, cxClient/2 - (Start.size() * 3), cyClient - 20, Start.c_str(), Start.size());
+	//}
+	//
+	//else
+	//	
+	//{
+	//	string Start = "Space to stop";
+	//	
+	//	TextOut(surface, cxClient/2 - (Start.size() * 3), cyClient - 20, Start.c_str(), Start.size());
+	//}
 
 	if(m_iGeneration>=m_iMaxGeneration)
 	{ 
 		Stop();
+		endTime=GetMillisecondsCount();
+		::ostringstream os;
+		os<<"diff = "<<endTime-startTime<<std::endl;
+		string TimeStr(os.str());
+TextOut(surface, cxClient/2 +(TimeStr.size() * 3), cyClient - 20, TimeStr.c_str(), TimeStr.size());
 		RestGA();
 		//add a best route genome
 		m_vecBestGenomes.push_back(m_vecGenomes[m_iFittestGenome]);
