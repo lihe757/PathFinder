@@ -195,14 +195,19 @@ void CBobsMap::RenderBestRoute(const int cxClient, const int cyClient, HDC surfa
 	vector<SPoint> fixed = FixToBestPath(bestRoute);
 	SPoint prePoint = m_spA;
 	vector<SPoint>::const_iterator iter = fixed.begin();
+	double total=0.0;
 	while(iter!=fixed.end())
 	{
 		SPoint nextPoint = *iter;
+		total+=prePoint.DistanceToMe(nextPoint);
 		DrawLine(surface,prePoint,nextPoint);
 		prePoint=nextPoint;
 		iter++;
 	}
-
+	std::ostringstream os;
+	os<<"Best Route Length = "<< total<<std::endl;
+	string Start(os.str());
+	TextOut(surface, cxClient/2, 0, Start.c_str(), Start.size());
 
 		//restore the original brush
 	SelectObject(surface, m_OldPen);
@@ -415,8 +420,8 @@ vector<SPoint> CBobsMap::FixToBestPath(const vector<WayPoint> &waypoints)
 		{
 			fCRel=vecPath[i].relativeXY;
 			
-			//if(abs(fBRel.y)>abs(fCRel.y)||Equal(fBRel.y,fCRel.y))
-			//{
+			if(abs(fBRel.y)>abs(fCRel.y)||Equal(fBRel.y,fCRel.y))
+			{
 				bool log = BarrierIntersection(preAbs,vecPath[i].absoluteXY);
 				if(!log)
 				{
@@ -424,7 +429,7 @@ vector<SPoint> CBobsMap::FixToBestPath(const vector<WayPoint> &waypoints)
 					fAbs =vecPath[i].absoluteXY;
 					q=i;
 				}
-			//}
+			}
 
 		}
 

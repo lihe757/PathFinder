@@ -147,6 +147,11 @@ void CgaBob::Epoch()
 
 	//create some storage for the baby genomes 
 	vector<SGenome> vecBabyGenomes;
+	
+	for(int i=0;i<2;i++)
+	{
+		vecBabyGenomes.push_back(m_vecGenomes[m_iFittestGenome]);
+	}
 
 	while (NewBabies < m_iPopSize)
 	{

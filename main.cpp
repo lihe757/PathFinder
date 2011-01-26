@@ -236,6 +236,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd,
 			{
 				case VK_RETURN:
 				{
+					
 					g_pGABob->Run(hwnd);
 
 				}
