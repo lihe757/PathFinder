@@ -18,23 +18,23 @@ long   GetMillisecondsCount()
 SGenome& CgaBob::RouletteWheelSelection()
 {
 	double fSlice	= RandFloat() * m_dTotalFitnessScore;
-	
+
 	double cfTotal	= 0.0;
-	
+
 	int	SelectedGenome = 0;
-	
+
 	for (int i=0; i<m_iPopSize; ++i)
 	{
-		
+
 		cfTotal += m_vecGenomes[i].dFitness;
-		
+
 		if (cfTotal > fSlice) 
 		{
 			SelectedGenome = i;
 			break;
 		}
 	}
-	
+
 	return m_vecGenomes[SelectedGenome];
 }
 
@@ -63,8 +63,8 @@ void CgaBob::Mutate2(vector<int> &vectYCoordinates)
 //---------------------------------------------------------------------
 void CgaBob:: Crossover2(const vector<int>	&mum,
 						 const  vector<int>	&dad,
-								vector<int>	&baby1,
-								vector<int>	&baby2)
+						 vector<int>	&baby1,
+						 vector<int>	&baby2)
 {
 	//just return parents as offspring dependent on the rate
 	//or if parents are the same
@@ -75,7 +75,7 @@ void CgaBob:: Crossover2(const vector<int>	&mum,
 
 		return;
 	}
-	
+
 	//determine a crossover point
 	int cp = RandInt(0, m_iChromoLength - 1);
 
@@ -106,9 +106,9 @@ void CgaBob::Run(HWND hwnd)
 	//The first thing we have to do is create a random population
 	//of genomes
 	CreateStartPopulation();
-	
+
 	m_bBusy = true;
-		
+
 }
 //----------------------CreateStartPopulation---------------------------
 //
@@ -117,10 +117,10 @@ void CgaBob::CreateStartPopulation()
 {
 	//clear existing population
 	m_vecGenomes.clear();
-	
+
 	for (int i=0; i<m_iPopSize; i++)
 	{
-		
+
 		//lhx
 		vector<int> yCoordinates;
 		while(!m_BobsMap.GetOneValidPath(yCoordinates,m_iChromoLength))
@@ -128,7 +128,7 @@ void CgaBob::CreateStartPopulation()
 			yCoordinates.clear();
 		}
 		m_vecGenomes.push_back(SGenome (yCoordinates));
-	
+
 	}
 
 	//reset all variables
@@ -147,8 +147,8 @@ void CgaBob::CreateStartPopulation()
 void CgaBob::Epoch()
 {
 
-	
-	
+
+
 	UpdateFitnessScores();
 
 	//Now to create a new population
@@ -156,7 +156,7 @@ void CgaBob::Epoch()
 
 	//create some storage for the baby genomes 
 	vector<SGenome> vecBabyGenomes;
-	
+
 	for(int i=0;i<2;i++)
 	{
 		vecBabyGenomes.push_back(m_vecGenomes[m_iFittestGenome]);
@@ -167,7 +167,7 @@ void CgaBob::Epoch()
 		//select 2 parents
 		SGenome mum = RouletteWheelSelection();
 		SGenome dad = RouletteWheelSelection();
-	
+
 
 		//operator - crossover
 		SGenome baby1, baby2;
@@ -183,7 +183,7 @@ void CgaBob::Epoch()
 
 		NewBabies += 2;
 	}
-	
+
 	//copy babies back into starter population
 	m_vecGenomes = vecBabyGenomes;
 
@@ -206,7 +206,7 @@ void CgaBob::UpdateFitnessScores()
 
 	m_bBusy=true;
 	CBobsMap TempMemory;
-	 
+
 	//update the fitness scores and keep a check on fittest so far
 	for (int i=0; i<m_iPopSize; ++i)
 	{
@@ -222,16 +222,16 @@ void CgaBob::UpdateFitnessScores()
 			m_fShortestRoute = TourLength;
 			m_iFittestGenome = i;
 		}
-		
+
 		//keep a track of the worst tour each generation
 		if (TourLength > m_fLongestRoute)
 		{
 			m_fLongestRoute = TourLength;
 		}
-	
+
 	}//next genome
 
-	
+
 	//Now we have calculated all the tour lengths we can assign
 	//the fitness scores
 	for (int i=0; i<m_iPopSize; ++i)
@@ -252,46 +252,47 @@ void CgaBob::UpdateFitnessScores()
 //----------------------------------------------------------------
 void CgaBob::Render(int cxClient, int cyClient, HDC surface)
 {
-	////render the map
-	//m_BobsMap.Render(cxClient, cyClient, surface);
+	//绘制地图
+	m_BobsMap.Render(cxClient, cyClient, surface);
+	//绘制原始路径
+	if(m_bShowOrigin)
+	{
+		m_BobsBrain.RenderOriginRoute(cxClient, cyClient, surface);
+	}
+	//绘制精简路径
+	if(m_bShowFixed)
+	{
+		m_BobsBrain.RenderShortRoute(cxClient, cyClient, surface);
+	}
 
-	//if(m_bShowOrigin)
-	//{
-	//	m_BobsBrain.RenderOriginRoute(cxClient, cyClient, surface);
-	//}
-	//if(m_bShowFixed)
-	//{
-	//	m_BobsBrain.RenderShortRoute(cxClient, cyClient, surface);
-	//}
-	//
 
-	////Render additional information
-	//string s = "Generation: " + itos(m_iGeneration);
-	//TextOut(surface, 5, 0, s.c_str(), s.size());
-	//
-	//if (!m_bBusy)
-	//{
-	//	string Start = "Press Return to start a new run";
-	//	
-	//	TextOut(surface, cxClient/2 - (Start.size() * 3), cyClient - 20, Start.c_str(), Start.size());
-	//}
-	//
-	//else
-	//	
-	//{
-	//	string Start = "Space to stop";
-	//	
-	//	TextOut(surface, cxClient/2 - (Start.size() * 3), cyClient - 20, Start.c_str(), Start.size());
-	//}
+	//绘制 额外参数 信息
+	string s = "Generation: " + itos(m_iGeneration);
+	TextOut(surface, 5, 0, s.c_str(), s.size());
+
+	if (!m_bBusy)
+	{
+		string Start = "Press Return to start a new run";
+
+		TextOut(surface, cxClient/2 - (Start.size() * 3), cyClient - 20, Start.c_str(), Start.size());
+	}
+
+	else
+
+	{
+		string Start = "Space to stop";
+
+		TextOut(surface, cxClient/2 - (Start.size() * 5), cyClient - 20, Start.c_str(), Start.size());
+	}
 
 	if(m_iGeneration>=m_iMaxGeneration)
 	{ 
 		Stop();
 		endTime=GetMillisecondsCount();
 		::ostringstream os;
-		os<<"diff = "<<endTime-startTime<<std::endl;
+		os<<"Cost Time = "<<endTime-startTime<<"(ms)";
 		string TimeStr(os.str());
-TextOut(surface, cxClient/2 +(TimeStr.size() * 3), cyClient - 20, TimeStr.c_str(), TimeStr.size());
+		TextOut(surface, cxClient/2 +(TimeStr.size() * 3), cyClient - 20, TimeStr.c_str(), TimeStr.size());
 		RestGA();
 		//add a best route genome
 		m_vecBestGenomes.push_back(m_vecGenomes[m_iFittestGenome]);
@@ -312,20 +313,20 @@ TextOut(surface, cxClient/2 +(TimeStr.size() * 3), cyClient - 20, TimeStr.c_str(
 
 
 	}
-	
+
 }
 
- void	CgaBob::SetShowOption(bool showOrigin,bool showFixed)
- {
-	 m_bShowOrigin = showOrigin;
-	 m_bShowFixed=showFixed;
+void	CgaBob::SetShowOption(bool showOrigin,bool showFixed)
+{
+	m_bShowOrigin = showOrigin;
+	m_bShowFixed=showFixed;
 
- }
- //Rest ALL GA to do new Run
- void	CgaBob::RestGA()
- {
-						  m_dTotalFitnessScore=0;
-                          m_iGeneration=0;
-                    	  m_fLongestRoute=0;
-						  m_fShortestRoute=9999.0;
- }
+}
+//Rest ALL GA to do new Run
+void	CgaBob::RestGA()
+{
+	m_dTotalFitnessScore=0;
+	m_iGeneration=0;
+	m_fLongestRoute=0;
+	m_fShortestRoute=9999.0;
+}
