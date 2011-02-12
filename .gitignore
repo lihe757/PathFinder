@@ -1,0 +1,8 @@
+/Debug
+/Release
+*.aps
+*.opt
+*.plg
+*.vcproj.*
+*.ncb
+
