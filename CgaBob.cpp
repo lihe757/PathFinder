@@ -157,10 +157,12 @@ void CgaBob::Epoch()
 	//create some storage for the baby genomes 
 	vector<SGenome> vecBabyGenomes;
 
+#ifdef USE_ELITISIM
 	for(int i=0;i<2;i++)
 	{
 		vecBabyGenomes.push_back(m_vecGenomes[m_iFittestGenome]);
 	}
+#endif
 
 	while (NewBabies < m_iPopSize)
 	{
@@ -252,6 +254,8 @@ void CgaBob::UpdateFitnessScores()
 //----------------------------------------------------------------
 void CgaBob::Render(int cxClient, int cyClient, HDC surface)
 {
+
+#ifndef TEST_PERFORMANCE
 	//绘制地图
 	m_BobsMap.Render(cxClient, cyClient, surface);
 	//绘制原始路径
@@ -264,6 +268,7 @@ void CgaBob::Render(int cxClient, int cyClient, HDC surface)
 	{
 		m_BobsBrain.RenderShortRoute(cxClient, cyClient, surface);
 	}
+#endif
 
 
 	//绘制 额外参数 信息

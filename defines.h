@@ -39,4 +39,8 @@
 #define GENERATIONS		30
 
 #define UM_SPAWN_NEW (WM_USER + 0)
+
+//test time performance
+//#define TEST_PERFORMANCE
+#define USE_ELITISIM
 #endif
