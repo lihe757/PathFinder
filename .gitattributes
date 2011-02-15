@@ -1,0 +1,7 @@
+*.dsp binary
+*.dsw binary
+*.rc binary
+*.sln binary
+*.suo binary
+*.vcproj binary
+
